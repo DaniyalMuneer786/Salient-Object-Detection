@@ -1,0 +1,47 @@
+ avg_dice_loss 16.59245
+wandb:                       avg_iou 0.79961
+wandb:                      avg_loss 16.59295
+wandb:              avg_ranking_loss 0.00049
+wandb:                         epoch 12
+wandb:                  f_max (DUTS) 0.88796
+wandb:             f_max (DUT_OMRON) 0.81883
+wandb:                 f_max (ECSSD) 0.94306
+wandb:               f_max_ub (DUTS) 0.8892
+wandb:          f_max_ub (DUT_OMRON) 0.82109
+wandb:              f_max_ub (ECSSD) 0.94398
+wandb:                 f_mean (DUTS) 0.77545
+wandb:            f_mean (DUT_OMRON) 0.72606
+wandb:                f_mean (ECSSD) 0.8399
+wandb:              f_mean_ub (DUTS) 0.77661
+wandb:         f_mean_ub (DUT_OMRON) 0.72894
+wandb:             f_mean_ub (ECSSD) 0.84146
+wandb:                f_score (DUTS) 0.8438
+wandb:           f_score (DUT_OMRON) 0.76694
+wandb:               f_score (ECSSD) 0.90205
+wandb:             f_score_ub (DUTS) 0.84579
+wandb:        f_score_ub (DUT_OMRON) 0.77032
+wandb:            f_score_ub (ECSSD) 0.90389
+wandb:                    iou (DUTS) 0.76005
+wandb:               iou (DUT_OMRON) 0.70971
+wandb:                   iou (ECSSD) 0.84922
+wandb:                 iou_ub (DUTS) 0.76255
+wandb:            iou_ub (DUT_OMRON) 0.71324
+wandb:                iou_ub (ECSSD) 0.85141
+wandb:                    mae (DUTS) 0.04034
+wandb:               mae (DUT_OMRON) 0.05339
+wandb:                   mae (ECSSD) 0.04011
+wandb:                 mae_ub (DUTS) 0.03984
+wandb:            mae_ub (DUT_OMRON) 0.05262
+wandb:                mae_ub (ECSSD) 0.03948
+wandb:         pixel_accuarcy (DUTS) 0.96113
+wandb:    pixel_accuarcy (DUT_OMRON) 0.94793
+wandb:        pixel_accuarcy (ECSSD) 0.96186
+wandb:      pixel_accuarcy_ub (DUTS) 0.96168
+wandb: pixel_accuarcy_ub (DUT_OMRON) 0.94874
+wandb:     pixel_accuarcy_ub (ECSSD) 0.96256
+wandb:              s_measure (DUTS) 0.8715
+wandb:         s_measure (DUT_OMRON) 0.83754
+wandb:             s_measure (ECSSD) 0.90585
+wandb:           s_measure_ub (DUTS) 0.87291
+wandb:      s_measure_ub (DUT_OMRON) 0.83963
+wandb:          s_measure_ub (ECSSD) 0.90714
