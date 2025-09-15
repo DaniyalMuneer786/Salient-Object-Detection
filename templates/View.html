@@ -1,0 +1,4368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <title>SOD Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Professional, advanced multi-color animated gradient background */
+            background: linear-gradient(120deg, #1a223f 0%, #283e51 40%, #485563 70%, #6a11cb 90%, #2575fc 100%);
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated abstract overlay with professional accent colors */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(39,174,96,0.10) 0%, transparent 60%), /* teal accent */
+                radial-gradient(circle at 80% 70%, rgba(241,196,15,0.09) 0%, transparent 60%), /* gold accent */
+                radial-gradient(circle at 60% 20%, rgba(106,17,203,0.10) 0%, transparent 60%), /* purple accent */
+                radial-gradient(circle at 50% 100%, rgba(37,117,252,0.07) 0%, transparent 70%), /* blue accent */
+                linear-gradient(120deg, rgba(26,34,63,0.07) 0%, rgba(106,17,203,0.07) 100%);
+            animation: bgMovePro 22s linear infinite alternate;
+        }
+
+        @keyframes bgMovePro {
+            0% {
+                background-position:
+                    20% 30%,
+                    80% 70%,
+                    60% 20%,
+                    50% 100%,
+                    0% 0%;
+            }
+            100% {
+                background-position:
+                    30% 40%,
+                    70% 60%,
+                    50% 30%,
+                    60% 90%,
+                    100% 100%;
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .data-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .data-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .data-card .icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .data-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .data-display {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .data-display.active {
+            display: block;
+        }
+
+        .data-display h2 {
+            color: #FFFFFF;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .close-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 1rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .beautiful-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .beautiful-table thead {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .beautiful-table th,
+        .beautiful-table td {
+            padding: 12px 18px;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+
+        .beautiful-table tbody tr:nth-child(even) {
+            background-color: #f3f6ff;
+        }
+
+        .beautiful-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .beautiful-table tbody tr:hover {
+            background: #e0f7fa;
+            cursor: pointer;
+        }
+
+        .beautiful-table td {
+            color: #333;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .chart-title {
+            color: #333;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+
+        .admin-dashboard-section {
+            color: white;
+        }
+
+
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 1rem;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 2rem;
+    }
+    
+    .chart-title {
+        color: #333;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    
+    canvas {
+        width: 100% !important;
+        height: 300px !important;
+    }
+    
+    .dashboard-section {
+        margin-bottom: 3rem;
+    }
+    
+    .section-title {
+        color: #FFFFFF;
+        margin: 2rem 0 1rem;
+        font-size: 1.5rem;
+        font-weight: 600;
+        border-bottom: 2px solid #667eea;
+        padding-bottom: 0.5rem;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-title {
+        color: #333;
+        margin-bottom: 1rem;
+        text-align: center;
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+
+
+/* Profile and Salary Container */
+.profile-salary-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+/* Profile Card */
+.profile-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #4e73df;
+}
+
+.profile-card h3 {
+    color: #4e73df;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.profile-details p {
+    margin: 12px 0;
+    font-size: 15px;
+}
+
+.profile-details strong {
+    color: #5a5c69;
+    min-width: 80px;
+    display: inline-block;
+}
+
+/* Salary Card */
+.salary-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid #1cc88a;
+    text-align: center;
+}
+
+.salary-card h3 {
+    color: #1cc88a;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.salary-amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #1cc88a;
+    margin: 10px 0;
+}
+
+/* Table Styles (same as before) */
+.admin-table-section {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.beautiful-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.beautiful-table th {
+    background: #f8f9fc;
+    color: #5a5c69;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.beautiful-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e3e6f0;
+    color: #5a5c69;
+}
+
+.beautiful-table tr:hover {
+    background-color: #f8f9fc;
+}
+
+
+
+.chart-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.chart-container {
+    flex: 1;
+    min-width: 300px;
+    height: 400px;
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-title {
+    margin: 0 0 15px 0;
+    font-size: 1.1rem;
+    color: #333;
+    text-align: center;
+}
+
+
+
+
+/* Add this to your style section */
+.data-table {
+    margin-bottom: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.chart-container {
+    margin-top: 1.5rem;
+}
+
+
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+}
+
+.spinner {
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.error-message {
+    padding: 20px;
+    background: #ffebee;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.error-message button {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+        /* Beautiful Table Styles */
+        .beautiful-table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin: 2rem 0;
+            overflow: hidden;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .table-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .table-title i {
+            color: #667eea;
+            font-size: 1.3rem;
+        }
+
+        .table-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .stat-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .enhanced-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            background: white;
+            font-size: 0.95rem;
+        }
+
+        .enhanced-table thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .enhanced-table th {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            position: relative;
+        }
+
+        .enhanced-table th:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 25%;
+            height: 50%;
+            width: 1px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .enhanced-table tbody tr {
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .enhanced-table tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .enhanced-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .enhanced-table tbody tr:hover {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .enhanced-table td {
+            padding: 1rem 1.5rem;
+            border: none;
+            color: #374151;
+            font-weight: 500;
+            vertical-align: middle;
+        }
+
+        .enhanced-table td:first-child {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .status-inactive {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .status-pending {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        /* Action buttons */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-action {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .btn-view {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Data type styling */
+        .data-email {
+            color: #3b82f6;
+            font-weight: 600;
+        }
+
+        .data-amount {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .data-date {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .data-id {
+            background: #f3f4f6;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #374151;
+        }
+
+        /* Table pagination */
+        .table-pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .pagination-info {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .btn-pagination {
+            padding: 0.5rem 1rem;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .btn-pagination:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+
+        .btn-pagination.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .btn-pagination:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Search and filter */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+        }
+
+        .filter-dropdown {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            color: #374151;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-dropdown:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Loading animation */
+        .table-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6b7280;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #d1d5db;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h3 {
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive table */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 768px) {
+            .enhanced-table {
+                font-size: 0.85rem;
+            }
+
+            .enhanced-table th,
+            .enhanced-table td {
+                padding: 0.75rem 1rem;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+
+            .btn-action {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.75rem;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .table-stats {
+                flex-wrap: wrap;
+            }
+        }
+        
+
+        .result-data-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .color-results {
+            display: flex;
+            gap: 5px;
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .color-details {
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        .beautiful-table-container {
+    background: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    margin: 2rem 0;
+    overflow: hidden;
+}
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.table-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d3748;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.table-title i {
+    color: #667eea;
+    font-size: 1.3rem;
+}
+
+.table-stats {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.stat-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    border-radius: 12px;
+}
+
+.enhanced-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    background: white;
+    font-size: 0.95rem;
+}
+
+.enhanced-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.enhanced-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    position: relative;
+}
+
+.enhanced-table th:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    height: 50%;
+    width: 1px;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.enhanced-table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.enhanced-table tbody tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.enhanced-table tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.enhanced-table tbody tr:hover {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.enhanced-table td {
+    padding: 1rem 1.5rem;
+    border: none;
+    color: #374151;
+    font-weight: 500;
+    vertical-align: middle;
+}
+
+.enhanced-table td:first-child {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+/* Status badges */
+.status-badge {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.status-inactive {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.status-pending {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.btn-action {
+    padding: 0.4rem 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.btn-view {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.btn-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Data type styling */
+.data-email {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.data-amount {
+    color: #10b981;
+    font-weight: 700;
+}
+
+.data-date {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.data-id {
+    background: #f3f4f6;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    color: #374151;
+}
+
+/* Table footer with toggle button */
+.table-footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.btn-toggle-view {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.btn-toggle-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading state */
+.table-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.loading-spinner {
+    border: 3px solid #f3f4f6;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+}
+
+.empty-state i {
+    font-size: 3rem;
+    color: #d1d5db;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .enhanced-table {
+        font-size: 0.85rem;
+    }
+
+    .enhanced-table th,
+    .enhanced-table td {
+        padding: 0.75rem 1rem;
+    }
+
+    .table-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: flex-start;
+    }
+
+    .table-stats {
+        flex-wrap: wrap;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .btn-action {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SOD Admin Dashboard</h1>
+        <div class="user-info">
+            <span>Welcome, {{ admin_username }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="dashboard-grid">
+            <div class="data-card" onclick="viewData('users'); loadSection('users')">
+                <h3><span class="icon">👥</span>User Data</h3>
+                <p>View and manage all registered users in the system</p>
+                <button class="view-btn">View Users</button>
+            </div>
+
+            <div class="data-card" onclick="viewData('images'); loadSection('images')">
+                <h3><span class="icon">🖼️</span>Image Data</h3>
+                <p>Browse uploaded images and file information</p>
+                <button class="view-btn">View Images</button>
+            </div>
+
+            <div class="data-card" onclick="viewData('results'); loadSection('results')">
+                <h3><span class="icon">📊</span>Result Data</h3>
+                <p>Check all the test results and performance metrics</p>
+                <button id="viewResultsBtn" class="view-btn">View Results</button>
+            </div>
+
+
+            <div class="data-card" onclick="viewData('subscriptions'); loadSection('subscriptions')">
+                <h3><span class="icon">📋</span>Subscription Data</h3>
+                <p>Manage user subscriptions and plans</p>
+                <button class="view-btn">View Subscriptions</button>
+            </div>
+
+            <div class="data-card" onclick="viewData('feedback'); loadSection('feedback')">
+                <h3><span class="icon">💬</span>Feedback Data</h3>
+                <p>Review user feedback and suggestions</p>
+                <button class="view-btn">View Feedback</button>
+            </div>
+            
+
+            <div class="data-card" onclick="viewData('admin'); loadSection('admin')">
+                <h3><span class="icon">⚙️</span>Admin Data</h3>
+                <p>View admin accounts and access logs</p>
+                <button class="view-btn">View Admins</button>
+            </div>
+        </div>
+
+
+
+
+
+<!-- Add this dynamic content area -->
+<div id="dynamicContent" class="dashboard-section">
+    <!-- Content will be loaded here based on selection -->
+</div>
+
+
+
+
+<!-- Results Section -->
+<div id="resultChartsContainer" style="display: none;">
+    <!-- <div id="resultChartsContainer"></div> -->
+</div>
+
+
+
+
+        <div class="data-display" id="dataDisplay">
+            <button class="close-btn" onclick="closeDataDisplay()">Close</button>
+            <h2 id="dataTitle">Data View</h2>
+            <div id="dataContent">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+
+
+
+
+
+<!-- Add this script after your existing scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/wordcloud"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+
+
+
+    <script>
+
+        // Load statistics on page load
+        window.addEventListener('load', function() {
+            loadStats();
+            createInitialCharts();
+        });
+        
+        // Function to create initial charts that display immediately
+        function createInitialCharts() {
+            // Create demo charts for immediate display
+            const chartData = {
+                userDemoChart: {
+                    labels: ['1-5 chars', '6-10 chars', '10+ chars'],
+                    data: [15, 25, 10],
+                    type: 'doughnut',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56']
+                },
+                subscriptionDemoChart: {
+                    labels: ['Basic', 'Premium', 'Enterprise'],
+                    data: [30, 45, 25],
+                    type: 'pie',
+                    colors: ['#4BC0C0', '#FF9F40', '#9966FF']
+                },
+                imageDemoChart: {
+                    labels: ['JPG', 'PNG', 'GIF', 'WEBP'],
+                    data: [120, 85, 30, 15],
+                    type: 'bar',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                },
+                resultDemoChart: {
+                    labels: ['Red', 'Blue', 'Green', 'Yellow', 'Purple'],
+                    data: [45, 32, 28, 15, 20],
+                    type: 'polarArea',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+                }
+            };
+            
+            // Create each chart
+            Object.keys(chartData).forEach(chartId => {
+                const canvas = document.getElementById(chartId);
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    const data = chartData[chartId];
+                    
+                    new Chart(ctx, {
+                        type: data.type,
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Count',
+                                data: data.data,
+                                backgroundColor: data.colors.map(color => color + '80'),
+                                borderColor: data.colors,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { 
+                                    position: 'top',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = Math.round((context.raw / total) * 100);
+                                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: data.type === 'bar' ? {
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
+                            } : {}
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function loadStats() {
+            const tables = ['user_management', 'result', 'payment', 'feedback', 'admin', 'image_processor', 'subscription'];
+            
+            tables.forEach(table => {
+                fetch(`/api/data/${table}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data) {
+                            document.getElementById(`${table.slice(0, -1)}Count`).textContent = data.data.length;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error loading ${table} stats:`, error);
+                    });
+            });
+            
+            // Create initial charts after loading stats
+            setTimeout(createInitialCharts, 500);
+        }
+        
+        // Function to create initial charts that display immediately
+        function createInitialCharts() {
+            // Create demo charts for immediate display
+            const chartData = {
+                userDemoChart: {
+                    labels: ['1-5 chars', '6-10 chars', '10+ chars'],
+                    data: [15, 25, 10],
+                    type: 'doughnut',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56']
+                },
+                subscriptionDemoChart: {
+                    labels: ['Basic', 'Premium', 'Enterprise'],
+                    data: [30, 45, 25],
+                    type: 'pie',
+                    colors: ['#4BC0C0', '#FF9F40', '#9966FF']
+                },
+                imageDemoChart: {
+                    labels: ['JPG', 'PNG', 'GIF', 'WEBP'],
+                    data: [120, 85, 30, 15],
+                    type: 'bar',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                },
+                resultDemoChart: {
+                    labels: ['Red', 'Blue', 'Green', 'Yellow', 'Purple'],
+                    data: [45, 32, 28, 15, 20],
+                    type: 'polarArea',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+                }
+            };
+            
+            // Create each chart
+            Object.keys(chartData).forEach(chartId => {
+                const canvas = document.getElementById(chartId);
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    const data = chartData[chartId];
+                    
+                    new Chart(ctx, {
+                        type: data.type,
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Count',
+                                data: data.data,
+                                backgroundColor: data.colors.map(color => color + '80'),
+                                borderColor: data.colors,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { 
+                                    position: 'top',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = Math.round((context.raw / total) * 100);
+                                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: data.type === 'bar' ? {
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
+                            } : {}
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function viewData(tableName) {
+            const dataDisplay = document.getElementById('dataDisplay');
+            const dataTitle = document.getElementById('dataTitle');
+            const dataContent = document.getElementById('dataContent');
+    
+            dataDisplay.classList.add('active');
+            dataTitle.textContent = `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} Data`;
+            dataContent.innerHTML = `
+                <div class="table-loading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading ${tableName} data...</p>
+                </div>
+            `;
+            
+            fetch(`/api/data/${tableName}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        dataContent.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <h3>Error Loading Data</h3>
+                                <p>${data.error}</p>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    if (data.data && data.data.length > 0) {
+                        createEnhancedTable(dataContent, tableName, data.data);
+                    } else {
+                        dataContent.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-database"></i>
+                                <h3>No Data Available</h3>
+                                <p>No ${tableName} data found in the system.</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    dataContent.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <h3>Connection Error</h3>
+                            <p>Failed to load ${tableName} data. Please try again.</p>
+                        </div>
+                    `;
+                });
+            }
+
+        function createBeautifulTable(container, tableName, data) {
+            const tableConfig = getTableConfig(tableName);
+            const itemsPerPage = 10;
+            let currentPage = 1;
+            let filteredData = [...data];
+            
+            function renderTable() {
+                const startIndex = (currentPage - 1) * itemsPerPage;
+                const endIndex = startIndex + itemsPerPage;
+                const pageData = filteredData.slice(startIndex, endIndex);
+                const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+                
+                container.innerHTML = `
+                    <div class="beautiful-table-container">
+                        <div class="table-header">
+                            <div class="table-title">
+                                <i class="fas ${tableConfig.icon}"></i>
+                                ${tableConfig.title}
+                            </div>
+                            <div class="table-stats">
+                                <span class="stat-badge">${filteredData.length} Records</span>
+                                <span class="stat-badge">Page ${currentPage} of ${totalPages}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="table-controls">
+                            <div class="search-box">
+                                <i class="fas fa-search"></i>
+                                <input type="text" id="searchInput" placeholder="Search ${tableName}..." />
+                            </div>
+                            <select class="filter-dropdown" id="filterDropdown">
+                                <option value="">All Records</option>
+                                ${tableConfig.filters ? tableConfig.filters.map(filter => 
+                                    `<option value="${filter.value}">${filter.label}</option>`
+                                ).join('') : ''}
+                            </select>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="enhanced-table">
+                                <thead>
+                                    <tr>
+                                        ${tableConfig.columns.map(col => `<th>${col.label}</th>`).join('')}
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${pageData.map((row, index) => `
+                                        <tr>
+                                            ${tableConfig.columns.map(col => {
+                                                const value = row[col.key];
+                                                return `<td>${formatCellValue(value, col.type, col.key)}</td>`;
+                                            }).join('')}
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <button class="btn-action btn-view" onclick="viewRecord('${tableName}', ${row[tableConfig.idKey]})">
+                                                        <i class="fas fa-eye"></i> View
+                                                    </button>
+                                                    <button class="btn-action btn-edit" onclick="editRecord('${tableName}', ${row[tableConfig.idKey]})">
+                                                        <i class="fas fa-edit"></i> Edit
+                                                    </button>
+                                                    <button class="btn-action btn-delete" onclick="deleteRecord('${tableName}', ${row[tableConfig.idKey]})">
+                                                        <i class="fas fa-trash"></i> Delete
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        ${totalPages > 1 ? `
+                            <div class="table-pagination">
+                                <div class="pagination-info">
+                                    Showing ${startIndex + 1} to ${Math.min(endIndex, filteredData.length)} of ${filteredData.length} records
+                                </div>
+                                <div class="pagination-controls">
+                                    <button class="btn-pagination" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                                        <i class="fas fa-chevron-left"></i> Previous
+                                    </button>
+                                    ${generatePageNumbers(currentPage, totalPages)}
+                                    <button class="btn-pagination" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                                        Next <i class="fas fa-chevron-right"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // Add event listeners
+                document.getElementById('searchInput').addEventListener('input', handleSearch);
+                document.getElementById('filterDropdown').addEventListener('change', handleFilter);
+            }
+            
+            function handleSearch(e) {
+                const searchTerm = e.target.value.toLowerCase();
+                filteredData = data.filter(row => {
+                    return tableConfig.columns.some(col => {
+                        const value = row[col.key];
+                        return value && value.toString().toLowerCase().includes(searchTerm);
+                    });
+                });
+                currentPage = 1;
+                renderTable();
+            }
+            
+            function handleFilter(e) {
+                const filterValue = e.target.value;
+                if (filterValue) {
+                    filteredData = data.filter(row => {
+                        const value = row[tableConfig.filterKey];
+                        return value && value.toString().toLowerCase() === filterValue.toLowerCase();
+                    });
+                } else {
+                    filteredData = [...data];
+                }
+                currentPage = 1;
+                renderTable();
+            }
+            
+            window.changePage = function(page) {
+                const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+                if (page >= 1 && page <= totalPages) {
+                    currentPage = page;
+                    renderTable();
+                }
+            };
+            
+            window.viewRecord = function(tableName, id) {
+                alert(`View ${tableName} record with ID: ${id}`);
+                // Implement view functionality
+            };
+            
+            window.editRecord = function(tableName, id) {
+                alert(`Edit ${tableName} record with ID: ${id}`);
+                // Implement edit functionality
+            };
+            
+            window.deleteRecord = function(tableName, id) {
+                if (confirm(`Are you sure you want to delete this ${tableName} record?`)) {
+                    alert(`Delete ${tableName} record with ID: ${id}`);
+                    // Implement delete functionality
+                }
+            };
+            
+            renderTable();
+        }
+
+        function getTableConfig(tableName) {
+            const configs = {
+                users: {
+                    title: 'User Management',
+                    icon: 'fa-users',
+                    idKey: 'User_ID',
+                    filterKey: 'Email',
+                    columns: [
+                        { key: 'User_ID', label: 'ID', type: 'id' },
+                        { key: 'Name', label: 'Name', type: 'text' },
+                        { key: 'Email', label: 'Email', type: 'email' },
+                        { key: 'Password', label: 'Password', type: 'password' },
+                        { key: 'Phone', label: 'Phone', type: 'text' }
+                    ],
+                    filters: [
+                        { value: 'active', label: 'Active Users' },
+                        { value: 'inactive', label: 'Inactive Users' }
+                    ]
+                },
+                images: {
+                    title: 'Image Data',
+                    icon: 'fa-image',
+                    idKey: 'image_id',
+                    filterKey: 'file_type',
+                    columns: [
+                        { key: 'image_id', label: 'ID', type: 'id' },
+                        { key: 'uploaded_image', label: 'Image', type: 'image' },
+                        { key: 'file_type', label: 'Type', type: 'text' },
+                        { key: 'file_size', label: 'Size (KB)', type: 'number' },
+                        { key: 'user_id', label: 'User ID', type: 'id' },
+                        { key: 'uploaded_at', label: 'Uploaded', type: 'date' }
+                    ],
+                    filters: [
+                        { value: 'jpg', label: 'JPG Files' },
+                        { value: 'png', label: 'PNG Files' },
+                        { value: 'gif', label: 'GIF Files' }
+                    ]
+                },
+                results: {
+                    title: 'Detection Results',
+                    icon: 'fa-chart-bar',
+                    idKey: 'Result_ID',
+                    showActions: true,
+                    columns: [
+                        { key: 'Result_ID', label: 'ID', type: 'id' },
+                        { key: 'Result_data', label: 'Result', type: 'json' }, // Changed to 'json' type
+                        { key: 'image_id', label: 'Image ID', type: 'id' },
+                        { key: 'User_ID', label: 'User ID', type: 'id' },
+                        { key: 'processed_at', label: 'Processed', type: 'date' }
+                    ]
+                },
+                subscriptions: {
+                    title: 'Subscription Data',
+                    icon: 'fa-credit-card',
+                    idKey: 'Subscription_ID',
+                    filterKey: 'Status',
+                    columns: [
+                        { key: 'Subscription_ID', label: 'ID', type: 'id' },
+                        { key: 'Plan_Type', label: 'Plan', type: 'text' },
+                        { key: 'Start_Date', label: 'Start Date', type: 'date' },
+                        { key: 'End_Date', label: 'End Date', type: 'date' },
+                        { key: 'Status', label: 'Status', type: 'status' },
+                        { key: 'Amount_Paid', label: 'Amount', type: 'amount' },
+                        { key: 'User_ID', label: 'User ID', type: 'id' }
+                    ],
+                    filters: [
+                        { value: 'active', label: 'Active Subscriptions' },
+                        { value: 'inactive', label: 'Inactive Subscriptions' }
+                    ]
+                },
+                feedback: {
+                    title: 'User Feedback',
+                    icon: 'fa-comments',
+                    idKey: 'Feedback_ID',
+                    filterKey: 'Feedback_Type',
+                    columns: [
+                        { key: 'Feedback_ID', label: 'ID', type: 'id' },
+                        { key: 'Rating', label: 'Rating', type: 'rating' },
+                        { key: 'Feedback_Type', label: 'Type', type: 'text' },
+                        { key: 'Feedback_Text', label: 'Feedback', type: 'text' },
+                        { key: 'User_ID', label: 'User ID', type: 'id' },
+                        { key: 'Result_ID', label: 'Result ID', type: 'id' }
+                    ],
+                    filters: [
+                        { value: 'general', label: 'General Feedback' },
+                        { value: 'result', label: 'Result Feedback' },
+                        { value: 'bug', label: 'Bug Reports' }
+                    ]
+                },
+                admin: {
+                    title: 'Admin Data',
+                    icon: 'fa-user-shield',
+                    idKey: 'Admin_ID',
+                    filterKey: 'Email',
+                    columns: [
+                        { key: 'Admin_ID', label: 'ID', type: 'id' },
+                        { key: 'Name', label: 'Name', type: 'text' },
+                        { key: 'Email', label: 'Email', type: 'email' },
+                        { key: 'Password', label: 'Password', type: 'password' },
+                        { key: 'Salary', label: 'Salary', type: 'amount' }
+                    ]
+                }
+            };
+            
+ return configs[tableName] || {
+        title: tableName.charAt(0).toUpperCase() + tableName.slice(1),
+        icon: 'fa-table',
+        idKey: 'id',
+        showActions: true,
+        columns: Object.keys(data[0] || {}).map(key => ({
+            key: key,
+            label: key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+            type: 'text'
+        }))
+    };
+}
+
+
+        function formatCellValue(value, type, key) {
+            if (value === null || value === undefined) {
+                return '<span style="color: #9ca3af; font-style: italic;">N/A</span>';
+            }
+            
+            switch (type) {
+                case 'id':
+                    return `<span class="data-id">${value}</span>`;
+                case 'email':
+                    return `<span class="data-email">${value}</span>`;
+                case 'amount':
+                    return `<span class="data-amount">$${parseFloat(value).toFixed(2)}</span>`;
+                case 'password':
+                    return '********';
+                case 'date':
+                    const date = new Date(value);
+                    return `<span class="data-date">${date.toLocaleDateString()}</span>`;
+                case 'status':
+                    const statusClass = value.toLowerCase() === 'active' ? 'status-active' : 
+                                      value.toLowerCase() === 'inactive' ? 'status-inactive' : 'status-pending';
+                    return `<span class="status-badge ${statusClass}">${value}</span>`;
+                case 'rating':
+                    return `<div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-weight: 600;">${value}/5</span>
+                                <div style="display: flex; gap: 2px;">
+                                    ${Array.from({length: 5}, (_, i) => 
+                                        `<i class="fas fa-star" style="color: ${i < value ? '#fbbf24' : '#d1d5db'}; font-size: 0.8rem;"></i>`
+                                    ).join('')}
+                                </div>
+                            </div>`;
+                case 'image':
+                    return `<img src="/static/uploads/${value}" alt="Image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid #e5e7eb;">`;
+                case 'text':
+                default:
+                    const text = value.toString();
+                    return text.length > 50 ? text.substring(0, 50) + '...' : text;
+            }
+        }
+
+        function generatePageNumbers(currentPage, totalPages) {
+            const pages = [];
+            const maxVisible = 5;
+            
+            if (totalPages <= maxVisible) {
+                for (let i = 1; i <= totalPages; i++) {
+                    pages.push(i);
+                }
+            } else {
+                if (currentPage <= 3) {
+                    for (let i = 1; i <= 4; i++) {
+                        pages.push(i);
+                    }
+                    pages.push('...');
+                    pages.push(totalPages);
+                } else if (currentPage >= totalPages - 2) {
+                    pages.push(1);
+                    pages.push('...');
+                    for (let i = totalPages - 3; i <= totalPages; i++) {
+                        pages.push(i);
+                    }
+                } else {
+                    pages.push(1);
+                    pages.push('...');
+                    for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                        pages.push(i);
+                    }
+                    pages.push('...');
+                    pages.push(totalPages);
+                }
+            }
+            
+            return pages.map(page => {
+                if (page === '...') {
+                    return '<span style="padding: 0.5rem 1rem; color: #6b7280;">...</span>';
+                }
+                const isActive = page === currentPage;
+                return `<button class="btn-pagination ${isActive ? 'active' : ''}" onclick="changePage(${page})">${page}</button>`;
+            }).join('');
+        }
+
+    // const userRole = "{{ login_role }}";
+
+    // window.addEventListener('load', function() {
+    //     if (userRole === 'admin') {
+    //         loadStats();  // Only fetch stats if admin
+    //     }
+    // });
+
+
+        function loadStats() {
+            const tables = ['user_management', 'result', 'payment', 'feedback', 'admin', 'image_processor', 'subscription'];
+            
+            tables.forEach(table => {
+                fetch(`/api/data/${table}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data) {
+                            document.getElementById(`${table.slice(0, -1)}Count`).textContent = data.data.length;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error loading ${table} stats:`, error);
+                    });
+            });
+            
+            // Create initial charts after loading stats
+            setTimeout(createInitialCharts, 500);
+        }
+        
+        // Function to create initial charts that display immediately
+        function createInitialCharts() {
+            // Create demo charts for immediate display
+            const chartData = {
+                userDemoChart: {
+                    labels: ['1-5 chars', '6-10 chars', '10+ chars'],
+                    data: [15, 25, 10],
+                    type: 'doughnut',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56']
+                },
+                subscriptionDemoChart: {
+                    labels: ['Basic', 'Premium', 'Enterprise'],
+                    data: [30, 45, 25],
+                    type: 'pie',
+                    colors: ['#4BC0C0', '#FF9F40', '#9966FF']
+                },
+                imageDemoChart: {
+                    labels: ['JPG', 'PNG', 'GIF', 'WEBP'],
+                    data: [120, 85, 30, 15],
+                    type: 'bar',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                },
+                resultDemoChart: {
+                    labels: ['Red', 'Blue', 'Green', 'Yellow', 'Purple'],
+                    data: [45, 32, 28, 15, 20],
+                    type: 'polarArea',
+                    colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
+                }
+            };
+            
+            // Create each chart
+            Object.keys(chartData).forEach(chartId => {
+                const canvas = document.getElementById(chartId);
+                if (canvas) {
+                    const ctx = canvas.getContext('2d');
+                    const data = chartData[chartId];
+                    
+                    new Chart(ctx, {
+                        type: data.type,
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Count',
+                                data: data.data,
+                                backgroundColor: data.colors.map(color => color + '80'),
+                                borderColor: data.colors,
+                                borderWidth: 2
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { 
+                                    position: 'top',
+                                    labels: {
+                                        padding: 20,
+                                        usePointStyle: true
+                                    }
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                            const percentage = Math.round((context.raw / total) * 100);
+                                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                                        }
+                                    }
+                                }
+                            },
+                            scales: data.type === 'bar' ? {
+                                y: { 
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
+                            } : {}
+                        }
+                    });
+                }
+            });
+        }
+
+
+        function closeDataDisplay() {
+            document.getElementById('dataDisplay').classList.remove('active');
+        }
+
+        // Optional: Animate the table fade-in
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (mutation.target.id === 'dataContent' && mutation.addedNodes.length) {
+                    mutation.target.style.opacity = 0;
+                    setTimeout(() => {
+                        mutation.target.style.transition = 'opacity 0.5s ease-in';
+                        mutation.target.style.opacity = 1;
+                    }, 100);
+                }
+            });
+        });
+
+        observer.observe(document.getElementById('dataContent'), { childList: true });
+
+
+
+        
+
+
+function viewData(tableName) {
+    const dataDisplay = document.getElementById('dataDisplay');
+    const dataTitle = document.getElementById('dataTitle');
+    const dataContent = document.getElementById('dataContent');
+
+    dataDisplay.classList.add('active');
+    dataTitle.textContent = `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} Data`;
+    dataContent.innerHTML = '<div class="loading">Loading...</div>';
+
+    fetch(`/api/data/${tableName}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.data.length > 0) {
+                let tableHTML = `<table class="data-table"><thead><tr>`;
+                
+                // Create table headers
+                Object.keys(data.data[0]).forEach(key => {
+                    tableHTML += `<th>${key}</th>`;
+                });
+                tableHTML += `</tr></thead><tbody>`;
+                
+                // Create table rows
+                data.data.forEach(row => {
+                    tableHTML += `<tr>`;
+                    Object.entries(row).forEach(([key, val]) => {
+                        // Only mask password fields
+                        if (key.toLowerCase() === 'password') {
+                            // Show only first 3 characters followed by asterisks
+                            const maskedValue = typeof val === 'string' && val.length > 3 
+                                ? val.substring(0, 3) + '*'.repeat(8) // Fixed length masking
+                                : '********';
+                            tableHTML += `<td title="Password (masked for security)">${maskedValue}</td>`;
+                        } else {
+                            // Regular data display for all other fields
+                            tableHTML += `<td>${val}</td>`;
+                        }
+                    });
+                    tableHTML += `</tr>`;
+                });
+                tableHTML += `</tbody></table>`;
+                dataContent.innerHTML = tableHTML;
+
+                // ===== Add canvas after table =====
+                const canvasId = `barChart-${tableName}`;
+                const chartBlock = document.createElement('div');
+                chartBlock.classList.add('chart-card');
+                chartBlock.innerHTML = `
+                    <h3 class="chart-title">Chart</h3>
+                    <canvas id="${canvasId}" width="400" height="300"></canvas>`;
+                dataContent.appendChild(chartBlock);
+
+                // ===== Load chart data =====
+                fetch(`/api/visualize/${tableName}`)
+                    .then(res => res.json())
+                    .then(chart => {
+                        if (chart.success) {
+                            createBarChart(canvasId, chart.label, chart.labels, chart.counts, 'rgba(54, 162, 235, 0.7)');
+                        } else {
+                            document.getElementById(canvasId).remove();
+                            chartBlock.innerHTML += `<p style="text-align:center; color:gray;">No chartable data</p>`;
+                        }
+                    });
+            } else {
+                dataContent.innerHTML = '<div class="loading">No data found</div>';
+            }
+        });
+}
+
+// function createBarChart(canvasId, label, labels, data, color) {
+//     const ctx = document.getElementById(canvasId).getContext('2d');
+//     new Chart(ctx, {
+//         type: 'bar',
+//         data: {
+//             labels: labels,
+//             datasets: [{
+//                 label: label,
+//                 data: data,
+//                 backgroundColor: color,
+//                 borderColor: color.replace('0.7', '1'),
+//                 borderWidth: 1
+//             }]
+//         },
+//         options: {
+//             responsive: true,
+//             plugins: {
+//                 legend: { position: 'top' }
+//             },
+//             scales: {
+//                 y: { beginAtZero: true }
+//             }
+//         }
+//     });
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+// Replace all previous chart loading code with this:
+
+// Section templates
+const sectionTemplates = {
+    users: `
+        <h2 class="section-title">User Analytics</h2>
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="totalUsers">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Subscribed Users</div>
+                <div class="stat-value" id="subscribedUsers">0</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">User Activity Levels</h3>
+                <canvas id="userActivityChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Subscription Status Distribution</h3>
+                <canvas id="subscriptionStatusChart"></canvas>
+            </div>
+        </div>
+    `,
+    subscriptions: `
+        <h2 class="section-title">Subscription Analytics</h2>
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Active Subscriptions</div>
+                <div class="stat-value" id="totalSubs">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Monthly Revenue</div>
+                <div class="stat-value" id="totalRevenue">$0</div>
+            </div>
+        </div>
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">Subscription Distribution</h3>
+                <canvas id="subscriptionChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Subscription Revenue</h3>
+                <canvas id="revenueChart"></canvas>
+            </div>
+        </div>
+    `,
+    images: `
+        <h2 class="section-title">Image Processing Analytics</h2>
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Images</div>
+                <div class="stat-value" id="totalImages">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. File Size</div>
+                <div class="stat-value" id="avgFileSize">0 KB</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Success Rate</div>
+                <div class="stat-value" id="successRate">0%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-value" id="activeUsers">0</div>
+            </div>
+        </div>
+        
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">File Type Distribution</h3>
+                <canvas id="fileTypeChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Processing Success Rate</h3>
+                <canvas id="successRateChart"></canvas>
+            </div>
+        </div>
+    `,
+results: `
+        <h2 class="section-title">Detection Results Analytics</h2>
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Results</div>
+                <div class="stat-value" id="totalResults">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Most Common File Type</div>
+                <div class="stat-value" id="commonFileType">-</div>
+            </div>
+        </div>
+        
+        <div class="chart-row">
+            <div class="chart-container">
+                <h3 class="chart-title">Dominant Color Distribution</h3>
+                <canvas id="colorChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">File Type Distribution</h3>
+                <canvas id="fileTypeChart"></canvas>
+            </div>
+        </div>
+        
+`,
+feedback: `
+        <h2 class="section-title">Feedback Analytics</h2>
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Feedback</div>
+                <div class="stat-value" id="totalFeedback">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Rating</div>
+                <div class="stat-value" id="avgRating">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">General Feedback</div>
+                <div class="stat-value" id="generalFeedbackCount">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Result Feedback</div>
+                <div class="stat-value" id="resultFeedbackCount">0</div>
+            </div>
+        </div>
+        
+        <div class="chart-row">
+            <div class="chart-container">
+                <h3 class="chart-title">Feedback Types</h3>
+                <canvas id="feedbackTypeChart" height="300"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Sentiment Analysis</h3>
+                <canvas id="feedbackSentimentChart" height="300"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-row">
+            <div class="chart-container">
+                <h3 class="chart-title">Rating Distribution</h3>
+                <canvas id="feedbackRatingChart" height="300"></canvas>
+            </div>
+        </div>
+    `,
+    admin: `
+<div class="admin-dashboard-section">
+    <h2>Admin Dashboard</h2>
+    
+    <!-- Profile and Salary Side by Side -->
+    <div class="profile-salary-container">
+        <!-- Profile Card -->
+        <div class="profile-card">
+            <h3><i class="fas fa-user-circle"></i> Your Profile</h3>
+            <div class="profile-details">
+                <p><strong>Admin ID:</strong> <span id="adminId" style="color: black">Loading...</span></p>
+                <p><strong>Name:</strong> <span id="adminName" style="color: black">Loading...</span></p>
+                <p><strong>Email:</strong> <span id="adminEmail" style="color: black">Loading...</span></p>
+            </div>
+        </div>
+        
+        <!-- Salary Card -->
+        <div class="salary-card">
+            <h3><i class="fas fa-money-bill-wave"></i> Salary Information</h3>
+            <div class="salary-details">
+                <div class="salary-amount" id="adminSalary">$0</div>
+                <p>Monthly compensation</p>
+            </div>
+        </div>
+    </div>
+    <hr>
+
+    </div>
+</div>
+
+
+    </div>
+`};
+
+
+
+// Current active chart references
+let activeCharts = {};
+
+// Load a specific section
+async function loadSection(section) {
+    const contentArea = document.getElementById('dynamicContent');
+    contentArea.innerHTML = sectionTemplates[section];
+    
+    // Clear previous charts
+    Object.values(activeCharts).forEach(chart => chart.destroy());
+    activeCharts = {};
+    
+    // Load section-specific data
+    switch(section) {
+        case 'users':
+            await loadUserSection();
+            break;
+        case 'subscriptions':
+            await loadSubscriptionSection();
+            break;
+        case 'images':
+            await loadImageSection();
+            break;
+        case 'results':
+            await loadResultsSection();
+            break;
+        case 'feedback':
+            await loadFeedbackSection();
+            break;
+        case 'admin':
+            await loadAdminData();
+            break;
+    }
+}
+
+async function loadUserSection() {
+    try {
+        const response = await fetch('/api/visualization/user_stats');
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to load user data');
+        }
+
+        // Update statistics
+        document.getElementById('totalUsers').textContent = data.total_users || 0;
+        
+        // Calculate subscribed users
+        const subscribedUsers = data.subscription_status ? 
+            data.subscription_status.filter(item => item.status === 'Active Subscription')
+                .reduce((sum, item) => sum + item.count, 0) : 0;
+        document.getElementById('subscribedUsers').textContent = subscribedUsers;
+
+        // 1. User Activity Levels Chart
+        if (data.user_activity && data.user_activity.length > 0) {
+            const activityCtx = document.getElementById('userActivityChart').getContext('2d');
+            activeCharts.userActivity = new Chart(activityCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.user_activity.map(item => item.level),
+                    datasets: [{
+                        label: 'Number of Users',
+                        data: data.user_activity.map(item => item.count),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.7)',
+                            'rgba(54, 162, 235, 0.7)',
+                            'rgba(255, 206, 86, 0.7)',
+                            'rgba(75, 192, 192, 0.7)',
+                            'rgba(153, 102, 255, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { 
+                            display: true, 
+                            text: 'User Activity Levels',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            title: { display: true, text: 'Number of Users' }
+                        },
+                        x: { 
+                            title: { display: true, text: 'Activity Level' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 2. Subscription Status Distribution Chart
+        if (data.subscription_status && data.subscription_status.length > 0) {
+            const subscriptionCtx = document.getElementById('subscriptionStatusChart').getContext('2d');
+            activeCharts.subscriptionStatus = new Chart(subscriptionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.subscription_status.map(item => item.status),
+                    datasets: [{
+                        data: data.subscription_status.map(item => item.count),
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { 
+                            display: true, 
+                            text: 'Subscription Status Distribution',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+
+
+    } catch (error) {
+        console.error('Error loading user section:', error);
+        // Create demo charts if API fails
+        createDemoUserCharts();
+    }
+}
+
+async function loadSubscriptionSection() {
+    try {
+        console.log('Loading subscription section...');
+        
+        const response = await fetch('/api/visualization/subscription_stats');
+        const data = await response.json();
+        
+        console.log('Subscription data received:', data);
+        
+        if (data.success) {
+            // Update statistics
+            const totalSubs = data.subscriptions.reduce((sum, sub) => sum + sub.count, 0);
+            document.getElementById('totalSubs').textContent = totalSubs;
+            document.getElementById('totalRevenue').textContent = `$${data.total_revenue.toFixed(2)}`;
+            
+            // Create subscription distribution chart
+            const subCtx = document.getElementById('subscriptionChart').getContext('2d');
+            activeCharts.subscription = new Chart(subCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.subscriptions.map(item => item.plan),
+                    datasets: [{
+                        data: data.subscriptions.map(item => item.count),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { 
+                            display: true, 
+                            text: 'Subscription Plan Distribution',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Create revenue chart
+            const revCtx = document.getElementById('revenueChart').getContext('2d');
+            activeCharts.revenue = new Chart(revCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.subscriptions.map(item => item.plan),
+                    datasets: [{
+                        label: 'Revenue ($)',
+                        data: data.subscriptions.map(item => item.revenue),
+                        backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 2,
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { 
+                            display: true, 
+                            text: 'Revenue by Plan',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Revenue: $${context.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            title: { display: true, text: 'Revenue ($)' }
+                        },
+                        x: { 
+                            title: { display: true, text: 'Plan Type' }
+                        }
+                    }
+                }
+            });
+            
+        } else {
+            console.error('Failed to load subscription data:', data.error);
+            // Create demo charts if API fails
+            createDemoSubscriptionCharts();
+        }
+    } catch (error) {
+        console.error('Error loading subscription section:', error);
+        // Create demo charts if API fails
+        createDemoSubscriptionCharts();
+    }
+}
+
+async function loadImageSection() {
+    try {
+        const [imgRes, resultRes] = await Promise.all([
+            fetch('/api/visualization/image_stats'),
+            fetch('/api/visualization/result_stats')
+        ]);
+        
+        const imgData = await imgRes.json();
+        const resultData = await resultRes.json();
+        
+        if (imgData.success && resultData.success) {
+            // Update statistics
+            document.getElementById('totalImages').textContent = imgData.total_images || 0;
+            document.getElementById('avgFileSize').textContent = `${imgData.avg_file_size || 0} KB`;
+            document.getElementById('successRate').textContent = `${resultData.success_rate || 0}%`;
+            document.getElementById('activeUsers').textContent = 
+                imgData.user_activity ? imgData.user_activity.reduce((sum, item) => sum + item.count, 0) : 0;
+            
+            
+            // 2. File Type Distribution Chart
+            const typeCtx = document.getElementById('fileTypeChart').getContext('2d');
+            activeCharts.fileTypes = new Chart(typeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: imgData.file_types.map(item => item.type),
+                    datasets: [{
+                        data: imgData.file_types.map(item => item.count),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)',
+                            'rgba(255, 159, 64, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { 
+                            display: true, 
+                            text: 'File Type Distribution',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                    return `${context.label}: ${context.raw} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+
+            
+            // 6. Success Rate Chart
+            const successCtx = document.getElementById('successRateChart').getContext('2d');
+            const successRate = resultData.success_rate || 0;
+            const failureRate = 100 - successRate;
+            
+            activeCharts.successRate = new Chart(successCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Successful', 'Failed'],
+                    datasets: [{
+                        data: [successRate, failureRate],
+                        backgroundColor: [
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(255, 99, 132, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(255, 99, 132, 1)'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: { 
+                            display: true, 
+                            text: 'Processing Success Rate',
+                            font: { size: 16, weight: 'bold' }
+                        },
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error loading image section:', error);
+        // Create demo charts if API fails
+        createDemoImageCharts();
+    }
+}
+
+async function loadResultsSection() {
+    try {
+        const container = document.getElementById('dynamicContent');
+        container.innerHTML = sectionTemplates.results;
+        
+        // Fetch enhanced data from the API
+        const response = await fetch('/api/visualization/result_data');
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.message || 'Failed to load result data');
+        }
+
+        // Update stats with real data
+        document.getElementById('totalResults').textContent = data.total_processed || 0;
+        
+        // Find and display the most common file type
+        if (data.file_type_data && data.file_type_data.length > 0) {
+            const mostCommonType = data.file_type_data.reduce((prev, current) => 
+                (prev.count > current.count) ? prev : current
+            );
+            document.getElementById('commonFileType').textContent = mostCommonType.name.toUpperCase();
+        }
+
+        // Create enhanced charts with better styling
+        createEnhancedColorChart(data.color_data);
+        createEnhancedFileTypeChart(data.file_type_data);
+        createSizeDistributionChart(data.size_data);
+        createProcessingTrendChart(data.processing_trend);
+        createCorrelationChart(data.correlation_data);
+
+    } catch (error) {
+        console.error('Error loading results:', error);
+        // Create demo charts if API fails
+        createDemoResultsCharts();
+    }
+}
+
+function createEnhancedColorChart(colorData) {
+    const ctx = document.getElementById('colorChart').getContext('2d');
+    
+    // Destroy previous chart if exists
+    if (window.activeCharts && window.activeCharts.colorChart) {
+        window.activeCharts.colorChart.destroy();
+    }
+    
+    const colors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+    ];
+    
+    window.activeCharts = window.activeCharts || {};
+    window.activeCharts.colorChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: colorData.map(item => item.name),
+            datasets: [{
+                label: 'Number of Images',
+                data: colorData.map(item => item.count),
+                backgroundColor: colors.slice(0, colorData.length),
+                borderColor: colors.slice(0, colorData.length).map(color => color.replace('0.7', '1')),
+                borderWidth: 2,
+                borderRadius: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'Dominant Color Distribution',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => `${ctx.raw} images`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Number of Images' }
+                },
+                x: {
+                    title: { display: true, text: 'Dominant Color' }
+                }
+            }
+        }
+    });
+}
+
+function createEnhancedFileTypeChart(fileTypeData) {
+    const ctx = document.getElementById('fileTypeChart').getContext('2d');
+    
+    // Destroy previous chart if exists
+    if (window.activeCharts && window.activeCharts.fileTypeChart) {
+        window.activeCharts.fileTypeChart.destroy();
+    }
+    
+    window.activeCharts = window.activeCharts || {};
+    window.activeCharts.fileTypeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: fileTypeData.map(item => item.name),
+            datasets: [{
+                data: fileTypeData.map(item => item.count),
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(153, 102, 255, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'File Type Distribution',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 20 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+
+async function loadFeedbackSection() {
+    try {
+        console.log('Loading feedback section...');
+        
+        // Clear previous content
+        const contentArea = document.getElementById('dynamicContent');
+        contentArea.innerHTML = `
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Loading feedback data...</p>
+            </div>
+        `;
+
+        console.log('Fetching feedback analytics from API...');
+        const response = await fetch('/api/feedback/analytics');
+        
+        if (!response.ok) {
+            // Get detailed error message if available
+            const errorData = await response.json().catch(() => ({}));
+            const errorMessage = errorData.error || 
+                               `HTTP error! status: ${response.status}`;
+            throw new Error(errorMessage);
+        }
+
+        const data = await response.json();
+        console.log('Feedback analytics data received:', data);
+        
+        if (data.success) {
+            console.log('Rendering feedback data...');
+            renderFeedbackData(data);
+        } else {
+            throw new Error(data.error || 'Failed to load feedback data');
+        }
+    } catch (error) {
+        console.error('Error loading feedback:', error);
+        
+        const contentArea = document.getElementById('dynamicContent');
+        contentArea.innerHTML = `
+            <div class="error-message">
+                <h3>Error Loading Feedback Data</h3>
+                <p>${error.message}</p>
+                <div class="error-details" style="display:none">
+                    <pre>${error.stack || 'No additional details available'}</pre>
+                </div>
+                <button onclick="toggleErrorDetails()">Show Details</button>
+                <button onclick="loadFeedbackSection()">Retry</button>
+            </div>
+        `;
+    }
+}
+
+function toggleErrorDetails() {
+    const details = document.querySelector('.error-details');
+    details.style.display = details.style.display === 'none' ? 'block' : 'none';
+}
+
+
+function renderFeedbackData(data) {
+    // Handle empty data scenario
+    if (!data.stats || data.stats.total === 0) {
+        const content = `
+            <h2 class="section-title">Feedback Analytics</h2>
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Feedback</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Avg. Rating</div>
+                    <div class="stat-value">0.0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">General Feedback</div>
+                    <div class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Result Feedback</div>
+                    <div class="stat-value">0</div>
+                </div>
+            </div>
+            
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3 class="chart-title">Feedback Types</h3>
+                    <canvas id="feedbackTypeChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Sentiment Analysis</h3>
+                    <canvas id="feedbackSentimentChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-row">
+                <div class="chart-container">
+                    <h3 class="chart-title">Rating Distribution</h3>
+                    <canvas id="feedbackRatingChart"></canvas>
+                </div>
+                
+            </div>
+        `;
+        
+        document.getElementById('dynamicContent').innerHTML = content;
+        
+        // Create empty charts
+        const emptyStats = {
+            total: 0,
+            avg_rating: 0,
+            types: { bug: 0, feature: 0, general: 0, result: 0 },
+            general: 0,
+            result: 0,
+            sentiment: { positive: 0, neutral: 0, negative: 0 },
+            ratings: [
+                {rating: 1, count: 0},
+                {rating: 2, count: 0},
+                {rating: 3, count: 0},
+                {rating: 4, count: 0},
+                {rating: 5, count: 0}
+            ]
+        };
+        createFeedbackCharts(emptyStats, []);
+        return;
+    }
+
+    const content = `
+        <h2 class="section-title">Feedback Analytics</h2>
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Feedback</div>
+                <div class="stat-value">${data.stats.total}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Avg. Rating</div>
+                <div class="stat-value">${data.stats.avg_rating.toFixed(1)}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">General Feedback</div>
+                <div class="stat-value">${data.stats.general}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Result Feedback</div>
+                <div class="stat-value">${data.stats.result}</div>
+            </div>
+        </div>
+        
+        <div class="chart-row">
+            <div class="chart-container">
+                <h3 class="chart-title">Feedback Types</h3>
+                <canvas id="feedbackTypeChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h3 class="chart-title">Sentiment Analysis</h3>
+                <canvas id="feedbackSentimentChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-row">
+            <div class="chart-container">
+                <h3 class="chart-title">Rating Distribution</h3>
+                <canvas id="feedbackRatingChart"></canvas>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('dynamicContent').innerHTML = content;
+    createFeedbackCharts(data.stats, data.trend);
+}
+
+function createFeedbackCharts(stats, trend) {
+    // Clear any existing charts
+    if (window.activeCharts) {
+        Object.values(window.activeCharts).forEach(chart => {
+            if (chart && typeof chart.destroy === 'function') {
+                chart.destroy();
+            }
+        });
+    }
+    window.activeCharts = {};
+
+    // 1. Feedback Types Chart
+    const typeCtx = document.getElementById('feedbackTypeChart').getContext('2d');
+    window.activeCharts.feedbackType = new Chart(typeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['General', 'Result'],
+            datasets: [{
+                data: [
+                    stats.types.general || 0,
+                    stats.types.result || 0
+                ],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(255, 99, 132, 0.8)'
+
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'Feedback Types Distribution',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. Sentiment Analysis Chart
+    const sentimentCtx = document.getElementById('feedbackSentimentChart').getContext('2d');
+    window.activeCharts.feedbackSentiment = new Chart(sentimentCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                data: [
+                    stats.sentiment.positive || 0,
+                    stats.sentiment.neutral || 0,
+                    stats.sentiment.negative || 0
+                ],
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(255, 99, 132, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'Sentiment Analysis',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 3. Rating Distribution Chart
+    const ratingCtx = document.getElementById('feedbackRatingChart').getContext('2d');
+    window.activeCharts.feedbackRating = new Chart(ratingCtx, {
+        type: 'bar',
+        data: {
+            labels: ['5 Stars', '4 Stars', '3 Stars', '2 Stars', '1 Star'],
+            datasets: [{
+                label: 'Number of Ratings',
+                data: stats.ratings.map(r => r.count || 0).reverse(),
+                backgroundColor: [
+                    'rgba(75, 192, 192, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(255, 99, 132, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'Rating Distribution',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `${context.label}: ${context.raw} ratings`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Number of Ratings'
+                    },
+                    ticks: {
+                        precision: 0
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Rating'
+                    }
+                }
+            }
+        }
+    });
+
+}
+
+
+function updateFeedbackStats(stats) {
+    console.log("Updating stats with:", stats); // Debug log
+    
+    const totalEl = document.getElementById('totalFeedback');
+    const avgRatingEl = document.getElementById('avgRating');
+    const generalEl = document.getElementById('generalFeedbackCount');
+    const resultEl = document.getElementById('resultFeedbackCount');
+    
+    if (totalEl) totalEl.textContent = stats.total || 0;
+    if (avgRatingEl) avgRatingEl.textContent = stats.avg_rating ? stats.avg_rating.toFixed(1) : '0';
+    if (generalEl) generalEl.textContent = stats.types.general || 0;
+    if (resultEl) resultEl.textContent = stats.types.result || 0;
+}
+
+
+
+function createChart(canvasId, config) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        console.error(`Canvas element with ID ${canvasId} not found`);
+        return;
+    }
+
+    // Destroy previous chart if exists
+    if (activeCharts[canvasId]) {
+        activeCharts[canvasId].destroy();
+    }
+
+    // Create new chart
+    const ctx = canvas.getContext('2d');
+    activeCharts[canvasId] = new Chart(ctx, config);
+    console.log(`Created chart: ${canvasId}`); // Debug log
+}
+
+// Function to create demo image charts when API fails
+function createDemoImageCharts() {
+    // Set demo stats
+    const totalImagesEl = document.getElementById('totalImages');
+    const avgFileSizeEl = document.getElementById('avgFileSize');
+    const successRateEl = document.getElementById('successRate');
+    const activeUsersEl = document.getElementById('activeUsers');
+    
+    if (totalImagesEl) totalImagesEl.textContent = '150';
+    if (avgFileSizeEl) avgFileSizeEl.textContent = '245 KB';
+    if (successRateEl) successRateEl.textContent = '95%';
+    if (activeUsersEl) activeUsersEl.textContent = '45';
+    
+    
+    // Create demo file type chart
+    const typeCtx = document.getElementById('fileTypeChart');
+    if (typeCtx) {
+        activeCharts.fileTypes = new Chart(typeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['JPEG', 'PNG', 'GIF', 'WebP', 'Other'],
+                datasets: [{
+                    data: [80, 45, 15, 8, 2],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'File Type Distribution',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                return `${context.label}: ${context.raw} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+
+    // Create demo success rate chart
+    const successCtx = document.getElementById('successRateChart');
+    if (successCtx) {
+        activeCharts.successRate = new Chart(successCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Successful', 'Failed'],
+                datasets: [{
+                    data: [95, 5],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 99, 132, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'Processing Success Rate',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Function to create demo user charts when API fails
+function createDemoUserCharts() {
+    // Set demo stats
+    const totalUsersEl = document.getElementById('totalUsers');
+    const subscribedUsersEl = document.getElementById('subscribedUsers');
+    
+    if (totalUsersEl) totalUsersEl.textContent = '125';
+    if (subscribedUsersEl) subscribedUsersEl.textContent = '45';
+    
+    // 1. Demo User Activity Levels Chart
+    const activityCtx = document.getElementById('userActivityChart');
+    if (activityCtx) {
+        activeCharts.userActivity = new Chart(activityCtx, {
+            type: 'bar',
+            data: {
+                labels: ['No Uploads', '1 Upload', '2-5 Uploads', '6-10 Uploads', '10+ Uploads'],
+                datasets: [{
+                    label: 'Number of Users',
+                    data: [35, 25, 30, 20, 15],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',
+                        'rgba(54, 162, 235, 0.7)',
+                        'rgba(255, 206, 86, 0.7)',
+                        'rgba(75, 192, 192, 0.7)',
+                        'rgba(153, 102, 255, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'User Activity Levels',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        title: { display: true, text: 'Number of Users' }
+                    },
+                    x: { 
+                        title: { display: true, text: 'Activity Level' }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Demo Subscription Status Chart
+    const subscriptionCtx = document.getElementById('subscriptionStatusChart');
+    if (subscriptionCtx) {
+        activeCharts.subscriptionStatus = new Chart(subscriptionCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Active Subscription', 'Inactive Subscription', 'No Subscription'],
+                datasets: [{
+                    data: [45, 15, 65],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(255, 99, 132, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(255, 99, 132, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'Subscription Status Distribution',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                return `${context.label}: ${context.raw} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Function to create demo subscription charts when API fails
+function createDemoSubscriptionCharts() {
+    // Set demo stats
+    const totalSubsEl = document.getElementById('totalSubs');
+    const totalRevenueEl = document.getElementById('totalRevenue');
+    
+    if (totalSubsEl) totalSubsEl.textContent = '25';
+    if (totalRevenueEl) totalRevenueEl.textContent = '$1,250.00';
+    
+    // Create demo subscription distribution chart
+    const subCtx = document.getElementById('subscriptionChart');
+    if (subCtx) {
+        activeCharts.subscription = new Chart(subCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Basic', 'Pro', 'Enterprise'],
+                datasets: [{
+                    data: [15, 8, 2],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'Subscription Plan Distribution',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                return `${context.label}: ${context.raw} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Create demo revenue chart
+    const revCtx = document.getElementById('revenueChart');
+    if (revCtx) {
+        activeCharts.revenue = new Chart(revCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Basic', 'Pro', 'Enterprise'],
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: [450, 600, 200],
+                    backgroundColor: 'rgba(75, 192, 192, 0.8)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'Revenue by Plan',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Revenue: $${context.raw.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        title: { display: true, text: 'Revenue ($)' }
+                    },
+                    x: { 
+                        title: { display: true, text: 'Plan Type' }
+                    }
+                }
+            }
+        });
+    }
+}
+
+// Helper function for chart options
+function getChartOptions(title) {
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            title: { 
+                display: true, 
+                text: title,
+                font: { size: 16, weight: 'bold' }
+            },
+            legend: {
+                position: 'bottom',
+                labels: { padding: 20 }
+            }
+        }
+    };
+}
+
+// Load admin data
+async function loadAdminData() {
+    try {
+        const response = await fetch('/api/admin_data');
+        const data = await response.json();
+        
+        if (data.success) {
+            // Update admin profile information
+            document.getElementById('adminId').textContent = data.admin_id || 'N/A';
+            document.getElementById('adminName').textContent = data.name || 'N/A';
+            document.getElementById('adminEmail').textContent = data.email || 'N/A';
+            document.getElementById('adminSalary').textContent = `$${data.salary || 0}`;
+        } else {
+            console.error('Failed to load admin data:', data.message);
+            // Set default values if API fails
+            document.getElementById('adminId').textContent = 'N/A';
+            document.getElementById('adminName').textContent = 'N/A';
+            document.getElementById('adminEmail').textContent = 'N/A';
+            document.getElementById('adminSalary').textContent = '$0';
+        }
+    } catch (error) {
+        console.error('Error loading admin data:', error);
+        // Set default values if API fails
+        document.getElementById('adminId').textContent = 'N/A';
+        document.getElementById('adminName').textContent = 'N/A';
+        document.getElementById('adminEmail').textContent = 'N/A';
+        document.getElementById('adminSalary').textContent = '$0';
+    }
+}
+
+function createSizeDistributionChart(sizeData) {
+    const ctx = document.getElementById('sizeChart');
+    if (!ctx) return;
+    
+    // Destroy previous chart if exists
+    if (window.activeCharts && window.activeCharts.sizeChart) {
+        window.activeCharts.sizeChart.destroy();
+    }
+    
+    window.activeCharts = window.activeCharts || {};
+    window.activeCharts.sizeChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sizeData.map(item => item.name),
+            datasets: [{
+                label: 'Number of Files',
+                data: sizeData.map(item => item.count),
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'File Size Distribution',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Number of Files' }
+                },
+                x: {
+                    title: { display: true, text: 'File Size Range' }
+                }
+            }
+        }
+    });
+}
+
+function createProcessingTrendChart(trendData) {
+    const ctx = document.getElementById('trendChart');
+    if (!ctx) return;
+    
+    // Destroy previous chart if exists
+    if (window.activeCharts && window.activeCharts.trendChart) {
+        window.activeCharts.trendChart.destroy();
+    }
+    
+    window.activeCharts = window.activeCharts || {};
+    window.activeCharts.trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: trendData.map(item => item.date),
+            datasets: [{
+                label: 'Processed Images',
+                data: trendData.map(item => item.count),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'Processing Trend (Last 30 Days)',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Number of Images' }
+                },
+                x: {
+                    title: { display: true, text: 'Date' }
+                }
+            }
+        }
+    });
+}
+
+function createCorrelationChart(correlationData) {
+    const ctx = document.getElementById('correlationChart');
+    if (!ctx) return;
+    
+    // Destroy previous chart if exists
+    if (window.activeCharts && window.activeCharts.correlationChart) {
+        window.activeCharts.correlationChart.destroy();
+    }
+    
+    // Group data by file type and color
+    const groupedData = {};
+    correlationData.forEach(item => {
+        const key = `${item.file_type}-${item.color}`;
+        if (!groupedData[key]) {
+            groupedData[key] = {
+                file_type: item.file_type,
+                color: item.color,
+                count: 0
+            };
+        }
+        groupedData[key].count += item.count;
+    });
+    
+    const labels = Object.values(groupedData).map(item => `${item.file_type}-${item.color}`);
+    const data = Object.values(groupedData).map(item => item.count);
+    
+    window.activeCharts = window.activeCharts || {};
+    window.activeCharts.correlationChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Count',
+                data: data,
+                backgroundColor: 'rgba(153, 102, 255, 0.8)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 2,
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: { 
+                    display: true, 
+                    text: 'File Type vs Color Correlation',
+                    font: { size: 16, weight: 'bold' }
+                },
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: 'Count' }
+                },
+                x: {
+                    title: { display: true, text: 'File Type - Color' }
+                }
+            }
+        }
+    });
+}
+
+// Function to create demo results charts when API fails
+function createDemoResultsCharts() {
+    // Set demo stats
+    const totalResultsEl = document.getElementById('totalResults');
+    const commonFileTypeEl = document.getElementById('commonFileType');
+    
+    if (totalResultsEl) totalResultsEl.textContent = '150';
+    if (commonFileTypeEl) commonFileTypeEl.textContent = 'JPEG';
+    
+    // Create demo color chart
+    const colorCtx = document.getElementById('colorChart');
+    if (colorCtx) {
+        activeCharts.colorChart = new Chart(colorCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Red', 'Blue', 'Green', 'Yellow', 'Purple', 'Mixed'],
+                datasets: [{
+                    label: 'Number of Images',
+                    data: [45, 32, 28, 15, 20, 10],
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ],
+                    borderColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                    ],
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'Dominant Color Distribution',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Number of Images' }
+                    },
+                    x: {
+                        title: { display: true, text: 'Dominant Color' }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Create demo file type chart
+    const fileTypeCtx = document.getElementById('fileTypeChart');
+    if (fileTypeCtx) {
+        activeCharts.fileTypeChart = new Chart(fileTypeCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['JPEG', 'PNG', 'GIF', 'WebP', 'Other'],
+                datasets: [{
+                    data: [80, 45, 15, 8, 2],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.8)',
+                        'rgba(54, 162, 235, 0.8)',
+                        'rgba(255, 206, 86, 0.8)',
+                        'rgba(75, 192, 192, 0.8)',
+                        'rgba(153, 102, 255, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: { 
+                        display: true, 
+                        text: 'File Type Distribution',
+                        font: { size: 16, weight: 'bold' }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        labels: { padding: 20 }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = total > 0 ? Math.round((context.raw / total) * 100) : 0;
+                                return `${context.label}: ${context.raw} (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function viewData(tableName) {
+    const dataDisplay = document.getElementById('dataDisplay');
+    const dataTitle = document.getElementById('dataTitle');
+    const dataContent = document.getElementById('dataContent');
+    
+    dataDisplay.classList.add('active');
+    dataTitle.textContent = `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} Data`;
+    dataContent.innerHTML = `
+        <div class="table-loading">
+            <div class="loading-spinner"></div>
+            <p>Loading ${tableName} data...</p>
+        </div>
+    `;
+    
+    fetch(`/api/data/${tableName}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                dataContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Error Loading Data</h3>
+                        <p>${data.error}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            if (data.data && data.data.length > 0) {
+                createEnhancedTable(dataContent, tableName, data.data);
+            } else {
+                dataContent.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-database"></i>
+                        <h3>No Data Available</h3>
+                        <p>No ${tableName} data found in the system.</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            dataContent.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Connection Error</h3>
+                    <p>Failed to load ${tableName} data. Please try again.</p>
+                </div>
+            `;
+        });
+}
+
+function createEnhancedTable(container, tableName, data) {
+    const tableConfig = getTableConfig(tableName);
+    const previewCount = 3; // Number of rows to show initially
+    let showAll = false;
+    
+    function renderTable() {
+        const displayData = showAll ? data : data.slice(0, previewCount);
+        
+        container.innerHTML = `
+            <div class="beautiful-table-container">
+                <div class="table-header">
+                    <div class="table-title">
+                        <i class="fas ${tableConfig.icon}"></i>
+                        ${tableConfig.title}
+                    </div>
+                    <div class="table-stats">
+                        <span class="stat-badge">${data.length} Records</span>
+                        ${!showAll && data.length > previewCount ? 
+                            `<span class="stat-badge">Showing ${previewCount} of ${data.length}</span>` : ''}
+                    </div>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="enhanced-table">
+                        <thead>
+                            <tr>
+                                ${tableConfig.columns.map(col => `<th>${col.label}</th>`).join('')}
+                                ${tableConfig.showActions ? `<th>Actions</th>` : ''}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${displayData.map((row, index) => `
+                                <tr>
+                                    ${tableConfig.columns.map(col => {
+                                        const value = row[col.key];
+                                        return `<td>${formatCellValue(value, col.type, col.key)}</td>`;
+                                    }).join('')}
+                                    ${tableConfig.showActions ? `
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn-action btn-view" onclick="viewRecord('${tableName}', ${row[tableConfig.idKey]})">
+                                                <i class="fas fa-eye"></i> View
+                                            </button>
+                                            <button class="btn-action btn-edit" onclick="editRecord('${tableName}', ${row[tableConfig.idKey]})">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button class="btn-action btn-delete" onclick="deleteRecord('${tableName}', ${row[tableConfig.idKey]})">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                    ` : ''}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                ${data.length > previewCount ? `
+                    <div class="table-footer">
+                        <button class="btn-toggle-view" onclick="toggleViewAll()">
+                            ${showAll ? 
+                                '<i class="fas fa-eye-slash"></i> Show Less' : 
+                                '<i class="fas fa-eye"></i> View All'}
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+    
+    window.toggleViewAll = function() {
+        showAll = !showAll;
+        renderTable();
+    };
+    
+    window.viewRecord = function(tableName, id) {
+        alert(`View ${tableName} record with ID: ${id}`);
+        // Implement view functionality
+    };
+    
+    window.editRecord = function(tableName, id) {
+        alert(`Edit ${tableName} record with ID: ${id}`);
+        // Implement edit functionality
+    };
+    
+    window.deleteRecord = function(tableName, id) {
+        if (confirm(`Are you sure you want to delete this ${tableName} record?`)) {
+            alert(`Delete ${tableName} record with ID: ${id}`);
+            // Implement delete functionality
+        }
+    };
+    
+    renderTable();
+}
+
+function getTableConfig(tableName) {
+    const configs = {
+        users: {
+            title: 'User Management',
+            icon: 'fa-users',
+            idKey: 'User_ID',
+            showActions: true,
+            columns: [
+                { key: 'User_ID', label: 'ID', type: 'id' },
+                { key: 'Name', label: 'Name', type: 'text' },
+                { key: 'Email', label: 'Email', type: 'email' },
+                { key: 'Password', label: 'Password', type: 'password' },
+                { key: 'Phone', label: 'Phone', type: 'text' }
+            ]
+        },
+        images: {
+            title: 'Image Data',
+            icon: 'fa-image',
+            idKey: 'image_id',
+            showActions: true,
+            columns: [
+                { key: 'image_id', label: 'ID', type: 'id' },
+                { key: 'uploaded_image', label: 'Image', type: 'image' },
+                { key: 'file_type', label: 'Type', type: 'text' },
+                { key: 'file_size', label: 'Size (KB)', type: 'number' },
+                { key: 'user_id', label: 'User ID', type: 'id' },
+                { key: 'uploaded_at', label: 'Uploaded', type: 'date' }
+            ]
+        },
+        results: {
+            title: 'Detection Results',
+            icon: 'fa-chart-bar',
+            idKey: 'result_id',
+            showActions: true,
+            columns: [
+                { key: 'result_id', label: 'ID', type: 'id' },
+                { key: 'result_data', label: 'Result', type: 'text' },
+                { key: 'image_id', label: 'Image ID', type: 'id' },
+                { key: 'user_id', label: 'User ID', type: 'id' },
+                { key: 'processed_at', label: 'Processed', type: 'date' }
+            ]
+        },
+        subscriptions: {
+            title: 'Subscription Data',
+            icon: 'fa-credit-card',
+            idKey: 'Subscription_ID',
+            showActions: true,
+            columns: [
+                { key: 'Subscription_ID', label: 'ID', type: 'id' },
+                { key: 'Plan_Type', label: 'Plan', type: 'text' },
+                { key: 'Start_Date', label: 'Start Date', type: 'date' },
+                { key: 'End_Date', label: 'End Date', type: 'date' },
+                { key: 'Status', label: 'Status', type: 'status' },
+                { key: 'Amount_Paid', label: 'Amount', type: 'amount' },
+                { key: 'User_ID', label: 'User ID', type: 'id' }
+            ]
+        },
+        feedback: {
+            title: 'User Feedback',
+            icon: 'fa-comments',
+            idKey: 'Feedback_ID',
+            showActions: true,
+            columns: [
+                { key: 'Feedback_ID', label: 'ID', type: 'id' },
+                { key: 'Rating', label: 'Rating', type: 'rating' },
+                { key: 'Feedback_Type', label: 'Type', type: 'text' },
+                { key: 'Feedback_Text', label: 'Feedback', type: 'text' },
+                { key: 'User_ID', label: 'User ID', type: 'id' },
+                { key: 'result_ID', label: 'Result ID', type: 'id' }
+            ]
+        },
+        admin: {
+            title: 'Admin Data',
+            icon: 'fa-user-shield',
+            idKey: 'Admin_ID',
+            showActions: true,
+            columns: [
+                { key: 'Admin_ID', label: 'ID', type: 'id' },
+                { key: 'Name', label: 'Name', type: 'text' },
+                { key: 'Email', label: 'Email', type: 'email' },
+                { key: 'Password', label: 'Password', type: 'password' },
+                { key: 'Salary', label: 'Salary', type: 'amount' }
+            ]
+        }
+    };
+    
+    return configs[tableName] || {
+        title: tableName.charAt(0).toUpperCase() + tableName.slice(1),
+        icon: 'fa-table',
+        idKey: 'id',
+        showActions: true,
+        columns: Object.keys(data[0] || {}).map(key => ({
+            key: key,
+            label: key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
+            type: 'text'
+        }))
+    };
+}
+
+
+function formatCellValue(value, type, key) {
+    if (value === null || value === undefined) {
+        return '<span style="color: #9ca3af; font-style: italic;">N/A</span>';
+    }
+    
+    switch (type) {
+        case 'id':
+            return `<span class="data-id">${value}</span>`;
+        case 'email':
+            return `<span class="data-email">${value}</span>`;
+        case 'amount':
+            return `<span class="data-amount">$${parseFloat(value).toFixed(2)}</span>`;
+        case 'password':
+            return '********';
+        case 'date':
+            const date = new Date(value);
+            return `<span class="data-date">${date.toLocaleDateString()}</span>`;
+        case 'status':
+            const statusClass = value.toLowerCase() === 'active' ? 'status-active' : 
+                              value.toLowerCase() === 'inactive' ? 'status-inactive' : 'status-pending';
+            return `<span class="status-badge ${statusClass}">${value}</span>`;
+        case 'rating':
+            return `<div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-weight: 600;">${value}/5</span>
+                        <div style="display: flex; gap: 2px;">
+                            ${Array.from({length: 5}, (_, i) => 
+                                `<i class="fas fa-star" style="color: ${i < value ? '#fbbf24' : '#d1d5db'}; font-size: 0.8rem;"></i>`
+                            ).join('')}
+                        </div>
+                    </div>`;
+        case 'image':
+            return `<img src="/static/uploads/${value}" alt="Image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px; border: 2px solid #e5e7eb;">`;
+        case 'text':
+        default:
+            const text = value.toString();
+            return text.length > 50 ? text.substring(0, 50) + '...' : text;
+    }
+}
+
+
+
+
+
+
+
+    </script> 
+
+</body>
+</html>

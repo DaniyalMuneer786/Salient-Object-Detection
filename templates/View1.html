@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOD Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(#667eea, #dc3545);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .data-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .data-card h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .data-card .icon {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .data-card p {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+
+        .view-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .data-display {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .data-display.active {
+            display: block;
+        }
+
+        .data-display h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .close-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            margin-bottom: 1rem;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .beautiful-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            font-size: 0.95rem;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .beautiful-table thead {
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+        }
+
+        .beautiful-table th,
+        .beautiful-table td {
+            padding: 12px 18px;
+            text-align: left;
+            transition: background 0.3s ease;
+        }
+
+        .beautiful-table tbody tr:nth-child(even) {
+            background-color: #f3f6ff;
+        }
+
+        .beautiful-table tbody tr:nth-child(odd) {
+            background-color: #ffffff;
+        }
+
+        .beautiful-table tbody tr:hover {
+            background: #e0f7fa;
+            cursor: pointer;
+        }
+
+        .beautiful-table td {
+            color: #333;
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SOD Admin Dashboard</h1>
+        <div class="user-info">
+            <span>Welcome, {{ admin_username }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="dashboard-grid">
+            <div class="data-card" onclick="viewData('users')">
+                <h3><span class="icon">👥</span>User Data</h3>
+                <p>View and manage all registered users in the system</p>
+                <button class="view-btn">View Users</button>
+            </div>
+
+            <div class="data-card" onclick="viewData('images')">
+                <h3><span class="icon">🖼️</span>Image Data</h3>
+                <p>Browse uploaded images and file information</p>
+                <button class="view-btn">View Images</button>
+            </div>
+
+            <div class="data-card" onclick="viewData('results')">
+                <h3><span class="icon">📊</span>Result Data</h3>
+                <p>Check all the test results and performance metrics</p>
+                <button class="view-btn">View Results</button>
+            </div>
+
+
+            <div class="data-card" onclick="viewData('subscriptions')">
+                <h3><span class="icon">📋</span>Subscription Data</h3>
+                <p>Manage user subscriptions and plans</p>
+                <button class="view-btn">View Subscriptions</button>
+            </div>
+
+            <div class="data-card" onclick="viewData('feedback')">
+                <h3><span class="icon">💬</span>Feedback Data</h3>
+                <p>Review user feedback and suggestions</p>
+                <button class="view-btn">View Feedback</button>
+            </div>
+
+            <div class="data-card" onclick="viewData('admin')">
+                <h3><span class="icon">⚙️</span>Admin Data</h3>
+                <p>View admin accounts and access logs</p>
+                <button class="view-btn">View Admins</button>
+            </div>
+        </div>
+
+        <div class="data-display" id="dataDisplay">
+            <button class="close-btn" onclick="closeDataDisplay()">Close</button>
+            <h2 id="dataTitle">Data View</h2>
+            <div id="dataContent">
+                <div class="loading">Loading...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load statistics on page load
+        window.addEventListener('load', function() {
+            loadStats();
+        });
+
+        function loadStats() {
+            const tables = ['user_management', 'result', 'payment', 'feedback', 'admin', 'image_processor', 'subscription'];
+            
+            tables.forEach(table => {
+                fetch(`/api/data/${table}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.data) {
+                            document.getElementById(`${table.slice(0, -1)}Count`).textContent = data.data.length;
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`Error loading ${table} stats:`, error);
+                    });
+            });
+        }
+
+
+        function viewData(tableName) {
+        const dataDisplay = document.getElementById('dataDisplay');
+        const dataTitle = document.getElementById('dataTitle');
+        const dataContent = document.getElementById('dataContent');
+        
+        dataDisplay.classList.add('active');
+        dataTitle.textContent = `${tableName.charAt(0).toUpperCase() + tableName.slice(1)} Data`;
+        dataContent.innerHTML = '<div class="loading">Loading...</div>';
+        
+        fetch(`/api/data/${tableName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    dataContent.innerHTML = `<div class="error">Error: ${data.error}</div>`;
+                    return;
+                }
+                
+                if (data.data && data.data.length > 0) {
+                    let tableHTML = `
+                        <table class="data-table" style="border-radius: 12px; overflow: hidden;">
+                            <thead style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                                <tr>`;
+                    
+                    Object.keys(data.data[0]).forEach(key => {
+                        tableHTML += `<th>${key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</th>`;
+                    });
+
+                    tableHTML += `</tr></thead><tbody>`;
+
+                    data.data.forEach((row, index) => {
+                        tableHTML += `<tr style="background-color: ${index % 2 === 0 ? '#fff' : '#f2f4f7'};">`;
+                        Object.values(row).forEach(value => {
+                            const val = value || '-';
+                            tableHTML += `<td title="${val}" style="max-width: 250px; word-wrap: break-word;">${val}</td>`;
+                        });
+                        tableHTML += `</tr>`;
+                    });
+
+                    tableHTML += '</tbody></table>';
+                    dataContent.innerHTML = tableHTML;
+                } else {
+                    dataContent.innerHTML = '<div class="loading">No data found</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                dataContent.innerHTML = '<div class="error">Error loading data</div>';
+            });
+    }
+
+    function closeDataDisplay() {
+        document.getElementById('dataDisplay').classList.remove('active');
+    }
+
+    // Optional: Animate the table fade-in
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.target.id === 'dataContent' && mutation.addedNodes.length) {
+                mutation.target.style.opacity = 0;
+                setTimeout(() => {
+                    mutation.target.style.transition = 'opacity 0.5s ease-in';
+                    mutation.target.style.opacity = 1;
+                }, 100);
+            }
+        });
+    });
+
+    observer.observe(document.getElementById('dataContent'), { childList: true });
+
+</script> 
+
+</body>
+</html>

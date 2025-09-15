@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - SelfMask</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-content">
+                <a href="/" class="nav-brand">SelfMask</a>
+                <div class="nav-links">
+                    <a href="/" class="nav-link">Home</a>
+                    <a href="/history" class="nav-link">History</a>
+                    <button onclick="handleLogout()" class="nav-link">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="history-section">
+                <div class="history-header">
+                    <h2>Prediction History</h2>
+                    <div class="history-filters">
+                        <select id="sort-by" class="form-input">
+                            <option value="date-desc">Newest First</option>
+                            <option value="date-asc">Oldest First</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="history-grid" id="history-grid">
+                    <!-- History items will be dynamically inserted here -->
+                </div>
+
+                <div class="pagination">
+                    <button id="prev-page" class="btn" disabled>Previous</button>
+                    <span id="page-info">Page 1 of 1</span>
+                    <button id="next-page" class="btn" disabled>Next</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="module">
+        import { handleLogout } from "{{ url_for('static', filename='js/main.js') }}";
+        window.handleLogout = handleLogout;
+
+        // State
+        let currentPage = 1;
+        let totalPages = 1;
+        let sortBy = 'date-desc';
+
+        // DOM Elements
+        const historyGrid = document.getElementById('history-grid');
+        const prevPageBtn = document.getElementById('prev-page');
+        const nextPageBtn = document.getElementById('next-page');
+        const pageInfo = document.getElementById('page-info');
+        const sortSelect = document.getElementById('sort-by');
+
+        // Event Listeners
+        prevPageBtn.addEventListener('click', () => loadPage(currentPage - 1));
+        nextPageBtn.addEventListener('click', () => loadPage(currentPage + 1));
+        sortSelect.addEventListener('change', (e) => {
+            sortBy = e.target.value;
+            loadPage(1);
+        });
+
+        // Load History
+        async function loadPage(page) {
+            try {
+                const response = await fetch(`/api/history?page=${page}&sort=${sortBy}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    displayHistory(data.items);
+                    updatePagination(data.pagination);
+                } else {
+                    showError(data.error || 'Failed to load history');
+                }
+            } catch (error) {
+                console.error('Error loading history:', error);
+                showError('An error occurred while loading history');
+            }
+        }
+
+        function displayHistory(items) {
+            historyGrid.innerHTML = items.map(item => `
+                <div class="history-item fade-in">
+                    <div class="history-item-header">
+                        <span class="history-date">${formatDate(item.created_at)}</span>
+                    </div>
+                    <div class="history-item-content">
+                        <img src="data:image/jpeg;base64,${item.original_image}" alt="Original" class="history-image">
+                        <img src="data:image/jpeg;base64,${item.saliency_map}" alt="Saliency Map" class="history-image">
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePagination(pagination) {
+            currentPage = pagination.current_page;
+            totalPages = pagination.total_pages;
+
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages;
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showError(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast error';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initial load
+        loadPage(1);
+    </script>
+</body>
+</html> 

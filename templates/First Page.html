@@ -1,0 +1,1775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Salient Object Detection</title>
+    <style>
+        /* Reuse your existing theme styles */
+        :root {
+          --background: #0d1117;
+          --foreground: #c9d1d9;
+          --primary: #00e6ac;
+          --primary-hover: #00b386;
+          --card: #21262d;
+          --card-foreground: #c9d1d9;
+          --muted: #30363d;
+          --muted-foreground: #8b949e;
+          --header: #161b22;
+        }
+
+        body {
+          font-family: "Arial", sans-serif;
+          margin: 0;
+          padding: 0;
+          /* Professional, advanced multi-color animated gradient background */
+          background: linear-gradient(120deg, #1a223f 0%, #283e51 40%, #485563 70%, #6a11cb 90%, #2575fc 100%);
+          color: var(--foreground);
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          /* Add subtle animated overlay for depth */
+          position: relative;
+          overflow-x: hidden;
+        }
+
+        /* Animated abstract overlay with professional accent colors */
+        body::before {
+          content: '';
+          position: fixed;
+          top: 0; left: 0; right: 0; bottom: 0;
+          z-index: 0;
+          pointer-events: none;
+          background:
+            radial-gradient(circle at 20% 30%, rgba(39,174,96,0.10) 0%, transparent 60%), /* teal accent */
+            radial-gradient(circle at 80% 70%, rgba(241,196,15,0.09) 0%, transparent 60%), /* gold accent */
+            radial-gradient(circle at 60% 20%, rgba(106,17,203,0.10) 0%, transparent 60%), /* purple accent */
+            radial-gradient(circle at 50% 100%, rgba(37,117,252,0.07) 0%, transparent 70%), /* blue accent */
+            linear-gradient(120deg, rgba(26,34,63,0.07) 0%, rgba(106,17,203,0.07) 100%);
+          animation: bgMovePro 22s linear infinite alternate;
+        }
+
+        @keyframes bgMovePro {
+          0% {
+            background-position:
+              20% 30%,
+              80% 70%,
+              60% 20%,
+              50% 100%,
+              0% 0%;
+          }
+          100% {
+            background-position:
+              30% 40%,
+              70% 60%,
+              50% 30%,
+              60% 90%,
+              100% 100%;
+          }
+        }
+
+        /* Header Styles */
+        header {
+          background-color: var(--header);
+          padding: 20px 40px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          box-sizing: border-box;
+        }
+
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .logo {
+          font-size: 1.5rem;
+          color: var(--primary);
+          font-weight: bold;
+          text-decoration: none;
+        }
+
+        /* Auth Container */
+        .auth-container {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 40px 20px;
+          position: relative;
+          z-index: 1;
+        }
+
+        .auth-card {
+          background-color: rgba(33, 38, 45, 0.98); /* Slightly more transparent for depth */
+          border-radius: 16px;
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 8px rgba(0,0,0,0.10);
+          padding: 48px 40px;
+          width: 100%;
+          max-width: 450px;
+          margin: 20px;
+          backdrop-filter: blur(2px);
+        }
+
+        .auth-card h2 {
+          color: var(--primary);
+          font-size: 1.8rem;
+          margin-bottom: 30px;
+          text-align: center;
+        }
+
+        .auth-tabs {
+          display: flex;
+          margin-bottom: 30px;
+          border-bottom: 1px solid var(--muted);
+        }
+
+        .auth-tab {
+          padding: 12px 20px;
+          cursor: pointer;
+          text-align: center;
+          flex: 1;
+          color: var(--muted-foreground);
+          font-weight: bold;
+          transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+          color: var(--primary);
+          border-bottom: 2px solid var(--primary);
+        }
+
+        .auth-form {
+          display: none;
+        }
+
+        .auth-form.active {
+          display: block;
+        }
+
+        .form-group {
+          margin-bottom: 20px;
+        }
+
+        .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: bold;
+        }
+
+        .form-group input {
+          width: 100%;
+          padding: 12px;
+          background-color: var(--muted);
+          border: 1px solid var(--muted);
+          border-radius: 8px;
+          color: var(--foreground);
+          font-size: 1rem;
+          box-sizing: border-box;
+        }
+
+        .form-group input:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 2px rgba(0, 230, 172, 0.2);
+        }
+
+        .auth-button {
+          width: 100%;
+          padding: 15px;
+          border-radius: 8px;
+          font-size: 1.1rem;
+          font-weight: bold;
+          text-decoration: none;
+          transition: all 0.3s ease;
+          background-color: var(--primary);
+          color: var(--background);
+          border: none;
+          cursor: pointer;
+          margin-top: 10px;
+        }
+
+        .auth-button:hover {
+          border-style: double;
+          border-color: white;
+          background-color: var(--primary-hover);
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0, 230, 172, 0.4);
+        }
+
+        .auth-footer {
+          text-align: center;
+          margin-top: 20px;
+          color: var(--muted-foreground);
+        }
+
+        .auth-footer a {
+          color: var(--primary);
+          text-decoration: none;
+        }
+
+        .auth-footer a:hover {
+          text-decoration: underline;
+        }
+
+        .error-message {
+          color: #f97583;
+          margin-top: 5px;
+          font-size: 0.9rem;
+          display: none;
+        }
+
+        /* Footer Styles */
+        footer {
+          background-color: var(--header);
+          padding: 20px;
+          margin-top: auto;
+        }
+
+        .footer-content {
+          max-width: 1200px;
+          margin: 0 auto;
+          text-align: center;
+          color: var(--muted-foreground);
+          font-size: 0.9rem;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+          .auth-card {
+            padding: 30px 10px;
+            max-width: 98vw;
+          }
+
+          .success-message {
+              color: var(--primary);
+              margin-top: 20px;
+              text-align: center;
+              padding: 10px;
+              background-color: rgba(0, 230, 172, 0.1);
+              border-radius: 8px;
+              border-left: 4px solid var(--primary);
+              animation: fadeIn 0.5s ease-in-out;
+          }
+
+          @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+          }
+
+          .success-message {
+              animation: fadeIn 0.5s ease-in-out;
+          }
+          header {
+            padding: 15px;
+          }
+        }
+        .admin-login-wrapper {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .admin-login-button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(20deg, #2563EB, #FFFFFF);
+            color: var(--background);
+            font-weight: bold;
+            font-size: 1.05rem;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 152, 0, 0.3);
+        }
+
+        .admin-login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 152, 0, 0.5);
+            background: linear-gradient(135deg, #ff7043, #1E40AF);
+        }
+/* Forgot Password Modal Styles */
+#forgotPasswordModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+#forgotPasswordModal > div {
+    position: relative;
+    background-color: var(--card);
+    padding: 25px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+#forgotPasswordModal .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: #ff4444;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+#forgotPasswordModal .close-btn:hover {
+    transform: scale(1.2);
+    color: #ff0000;
+}
+
+#forgotPasswordModal .cancel-btn {
+    background-color: #ff4444;
+    color: white;
+    transition: background-color 0.2s;
+}
+
+#forgotPasswordModal .cancel-btn:hover {
+    background-color: #ff0000;
+}
+
+#forgotPasswordModal .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}    
+
+
+    #forgotPasswordModal h3 {
+        color: var(--primary);
+        margin-top: 0;
+        text-align: center;
+        font-size: 1.5rem;
+    }
+    
+    #forgotPasswordModal p {
+        color: var(--foreground);
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    #forgotPasswordModal input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        background-color: var(--muted);
+        border: 1px solid var(--muted);
+        border-radius: 8px;
+        color: var(--foreground);
+        font-size: 1rem;
+        box-sizing: border-box;
+    }
+    
+    #forgotPasswordModal input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(0, 230, 172, 0.2);
+    }
+    
+    #forgotPasswordModal button {
+        width: 100%;
+        padding: 12px;
+        background-color: var(--primary);
+        color: var(--background);
+        border: none;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    
+    #forgotPasswordModal button:hover {
+        background-color: var(--primary-hover);
+    }
+    
+    #userEmail {
+        color: var(--primary);
+        font-weight: bold;
+    }
+    
+    #forgotPasswordMessage {
+        margin-top: 15px;
+        text-align: center;
+        display: none;
+    }
+
+
+/* Close button styles */
+#otpVerificationModal .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: #ff4444;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+#otpVerificationModal .close-btn:hover {
+    transform: scale(1.2);
+    color: #ff0000;
+}
+
+/* Cancel button styles */
+#otpVerificationModal .cancel-btn {
+    background-color: #ff4444 !important;
+    color: white !important;
+    transition: background-color 0.2s;
+}
+
+#otpVerificationModal .cancel-btn:hover {
+    background-color: #ff0000 !important;
+}
+
+    
+    /* Forgot Password Link */
+    .forgot-password-link {
+        display: block;
+        text-align: center;
+        margin-top: 15px;
+        color: var(--primary);
+        text-decoration: none;
+        cursor: pointer;
+    }
+    
+    .forgot-password-link:hover {
+        text-decoration: underline;
+    }
+    #otpErrorMessage {
+        color: #f97583;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        text-align: center;
+        display: none;
+    }
+    #otpVerificationError {
+        color: #f97583;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        text-align: center;
+        display: none;
+    }
+
+/* Error message styling */
+.error-message {
+    color: #f97583;
+    margin: 10px 0;
+    padding: 8px 12px;
+    background-color: rgba(249, 117, 131, 0.1);
+    border-radius: 6px;
+    display: none;
+    text-align: center;
+}
+
+/* Success message styling */
+.success-message {
+    color: var(--primary);
+    margin: 20px auto;
+    padding: 15px;
+    background-color: rgba(0, 230, 172, 0.1);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary);
+    max-width: 450px;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+
+
+#otpVerificationModal {
+    display: none;
+    position: fixed;
+    top: 100px;
+    left: 50px;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease-out;
+    width: 300px; /* Fixed width for the modal */
+}
+
+#otpVerificationModal > div {
+    background-color: var(--card);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 100%; /* Take full width of parent */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+#signupOtpInput {
+    width: calc(100% - 20px); /* Account for padding */
+    padding: 10px;
+    margin: 10px 0;
+    background-color: var(--muted);
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    color: var(--foreground);
+    font-size: 1rem;
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+/* #otpVerificationModal button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: var(--primary);
+    color: var(--background);
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s; */
+    /* box-sizing: border-box; Include padding in width calculation */
+/* } */
+
+
+#otpVerificationModal h3 {
+    color: var(--primary);
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#otpVerificationModal p {
+    color: var(--foreground);
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+}
+
+
+
+/* #otpVerificationModal button:hover {
+    background-color: var(--primary-hover);
+} */
+
+
+
+
+
+
+
+
+
+/* ===================== Signup OTP Verification Modal ===================== */
+#otpVerificationModal {
+    display: none;
+    position: fixed;
+    top: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    width: 300px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+#otpVerificationModal > div {
+    background-color: var(--card);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-sizing: border-box;
+}
+
+#otpVerificationModal h3 {
+    color: var(--primary);
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#otpVerificationModal p {
+    color: var(--foreground);
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+#signupOtpInput {
+    width: 100%;
+    padding: 10px;
+    background-color: var(--muted);
+    border: 1px solid var(--muted);
+    border-radius: 6px;
+    color: var(--foreground);
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+#otpVerificationModal button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: var(--primary);
+    color: var(--background);
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    box-sizing: border-box;
+}
+
+#otpVerificationModal button:hover {
+    background-color: var(--primary-hover);
+}
+
+#otpVerificationModal .close-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: #ff4444;
+    font-size: 24px;
+    cursor: pointer;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: transform 0.2s;
+}
+
+#otpVerificationModal .close-btn:hover {
+    transform: scale(1.2);
+    color: #ff0000;
+}
+
+#otpVerificationError {
+    color: #f97583;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    text-align: center;
+    display: none;
+}
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">Salient Object Detection</a>
+        </div>
+    </header>
+
+    <div class="auth-container">
+        <div class="auth-card">
+            <h2>Welcome to the Salient Object Detecion System</h2>
+            
+            <div class="admin-login-wrapper">
+                   <a href="/admin_entry?role=admin" class="admin-login-button">🔐 Login as Admin</a>
+            </div>
+
+
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+            
+
+            <!-- =========================================================================== -->
+            <!-- Login Form -->
+            <form action="{{ url_for('login') }}" id="loginForm" class="auth-form active">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" name="email" required>
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+                
+                <button type="submit" class="auth-button">Login</button>
+                
+                <div class="auth-footer">
+                    <a href="#" class="forgot-password-link" onclick="showForgotPassword()">Forgot your password?</a>
+                </div>
+            </form>
+            
+
+
+            <!-- =========================================================================== -->
+            <!-- Signup Form -->
+            <form action="{{ url_for('signup') }}" id="signupForm" class="auth-form">
+                <!-- <div class="form-group">
+                    <label for="signupID">ID</label>
+                    <input type="number" id="signupID" name="ID" required>
+                    <div class="error-message" id="signupIDError"></div>
+                </div> -->
+
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" name="name" required>
+                    <div class="error-message" id="signupNameError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" name="email" required>
+                    <div class="error-message" id="signupEmailError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" name="password" required>
+                    <div class="error-message" id="signupPasswordError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="signupPhone">Phone Number</label>
+                    <input type="tel" id="signupPhone" name="phone">
+                    <div class="error-message" id="signupPhoneError"></div>
+                </div>
+                                
+                <button type="submit" class="auth-button">Create Account</button>
+                
+                <div class="auth-footer">
+                    Already have an account? <a href="#" class="switch-to-login">Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+
+
+<div id="forgotPasswordModal" style="display:none;">
+    <div style="background-color: var(--card); padding: 20px; border-radius: 12px; width: 400px; box-shadow: 0 6px 12px rgba(0,0,0,0.2); position: relative;">
+        <!-- Close button (×) - top right -->
+        <button onclick="hideForgotPasswordModal()" 
+                style="position: absolute; top: 5px; right: 5px; background: none; border: none; 
+                       color: #ff4444; font-size: 24px; cursor: pointer; width: 30px; height: 30px;
+                       display: flex; align-items: center; justify-content: center; padding: 0;">
+            ×
+        </button>
+
+        <h3 style="color: var(--primary); margin-top: 0; text-align: center;">Forgot Password</h3>
+        
+        <!-- Step 1: Email Input -->
+        <div id="step1">
+            <p style="color: var(--foreground); margin-bottom: 20px; text-align: center;">
+                Enter your email to receive a reset OTP
+            </p>
+            <input type="email" id="resetEmail" placeholder="Your email" 
+                   style="width: 100%; padding: 12px; margin-bottom: 15px; background-color: var(--muted);
+                          border: 1px solid var(--muted); border-radius: 8px; color: var(--foreground);">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="sendOTP()" 
+                        style="flex: 1; padding: 12px; background-color: var(--primary); 
+                               color: var(--background); border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Send OTP
+                </button>
+                <button onclick="hideForgotPasswordModal()" 
+                        style="flex: 1; padding: 12px; background-color: #ff4444; 
+                               color: white; border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+            <div id="otpErrorMessage" class="error-message" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- Step 2: OTP Verification -->
+        <div id="step2" style="display:none;">
+            <p style="color: var(--foreground); margin-bottom: 20px; text-align: center;">
+                Enter the 6-digit OTP sent to <span id="userEmail" style="font-weight: bold;"></span>
+            </p>
+            <input type="text" id="otpInput" placeholder="OTP" maxlength="6" 
+                   style="width: 100%; padding: 12px; margin-bottom: 15px; background-color: var(--muted);
+                          border: 1px solid var(--muted); border-radius: 8px; color: var(--foreground);">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="verifyOTP()" id="verifyOtpButton" 
+                        style="flex: 1; padding: 12px; background-color: var(--primary); 
+                               color: var(--background); border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Verify OTP
+                </button>
+                <button onclick="hideForgotPasswordModal()" 
+                        style="flex: 1; padding: 12px; background-color: #ff4444; 
+                               color: white; border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+            <div id="otpVerificationError" class="error-message" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- Step 3: Password Reset -->
+        <div id="step3" style="display:none;">
+            <h3 style="color: var(--primary); margin-top: 0; text-align: center;">Reset Password</h3>
+            <p style="color: var(--foreground); margin-bottom: 20px; text-align: center;">
+                Enter your new password
+            </p>
+            <input type="password" id="newPassword" placeholder="New password" required
+                   style="width: 100%; padding: 12px; margin-bottom: 15px; background-color: var(--muted);
+                          border: 1px solid var(--muted); border-radius: 8px; color: var(--foreground);">
+            <input type="password" id="confirmPassword" placeholder="Confirm password" required
+                   style="width: 100%; padding: 12px; margin-bottom: 15px; background-color: var(--muted);
+                          border: 1px solid var(--muted); border-radius: 8px; color: var(--foreground);">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="resetPassword()" 
+                        style="flex: 1; padding: 12px; background-color: var(--primary); 
+                               color: var(--background); border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Reset Password
+                </button>
+                <button onclick="hideForgotPasswordModal()" 
+                        style="flex: 1; padding: 12px; background-color: #ff4444; 
+                               color: white; border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+            <div id="passwordErrorMessage" class="error-message" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+</div>
+
+
+        <!-- Step 2: OTP Verification
+        <div id="step2" style="display:none;">
+            <p style="color: var(--foreground); margin-bottom: 20px; text-align: center;">
+                Enter the 6-digit OTP sent to <span id="userEmail" style="font-weight: bold;"></span>
+            </p>
+            <input type="text" id="otpInput" placeholder="OTP" maxlength="6" 
+                   style="width: 100%; padding: 12px; margin-bottom: 15px; background-color: var(--muted);
+                          border: 1px solid var(--muted); border-radius: 8px; color: var(--foreground);">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="verifyOTP()" 
+                        style="flex: 1; padding: 12px; background-color: var(--primary); 
+                               color: var(--background); border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Verify OTP
+                </button>
+                <button onclick="hideForgotPasswordModal()" 
+                        style="flex: 1; padding: 12px; background-color: #ff4444; 
+                               color: white; border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+            <div id="otpVerificationError" class="error-message" style="margin-top: 10px;"></div>
+        </div> -->
+
+        <!-- Step 3: Password Reset -->
+        <!-- <div id="step3" style="display:none;">
+            <h3 style="color: var(--primary); margin-top: 0; text-align: center;">Reset Password</h3>
+            <p style="color: var(--foreground); margin-bottom: 20px; text-align: center;">
+                Enter your new password
+            </p>
+            <input type="password" id="newPassword" placeholder="New password" required
+                   style="width: 100%; padding: 12px; margin-bottom: 15px; background-color: var(--muted);
+                          border: 1px solid var(--muted); border-radius: 8px; color: var(--foreground);">
+            <input type="password" id="confirmPassword" placeholder="Confirm password" required
+                   style="width: 100%; padding: 12px; margin-bottom: 15px; background-color: var(--muted);
+                          border: 1px solid var(--muted); border-radius: 8px; color: var(--foreground);">
+            <div style="display: flex; gap: 10px;">
+                <button onclick="resetPassword()" 
+                        style="flex: 1; padding: 12px; background-color: var(--primary); 
+                               color: var(--background); border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Reset Password
+                </button>
+                <button onclick="hideForgotPasswordModal()" 
+                        style="flex: 1; padding: 12px; background-color: #ff4444; 
+                               color: white; border: none; border-radius: 8px; 
+                               font-weight: bold; cursor: pointer;">
+                    Cancel
+                </button>
+            </div>
+            <div id="passwordErrorMessage" class="error-message" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+</div> -->
+
+
+
+<!-- ==================== Signup OTP Verification Modal ==================== -->
+<div id="otpVerificationModal">
+  <div>
+    <button class="close-btn" onclick="document.getElementById('otpVerificationModal').style.display = 'none'">&times;</button>
+    <h3>Verify Your Email</h3>
+    <p>Please enter the 6-digit OTP sent to your email</p>
+    <input type="text" id="signupOtpInput" placeholder="Enter OTP" maxlength="6" />
+    <button type="button" id="verifyOtpButton" onclick="verifySignupOTP()">Verify OTP</button>
+    <div id="otpVerificationError"></div>
+  </div>
+</div>
+
+
+    <footer>
+        <div class="footer-content">
+            &copy; <span id="current-year"></span> Salient Object Detection. All rights reserved.
+        </div>
+    </footer>
+
+            <!-- =========================================================================== -->
+    
+<script>
+
+ 
+    document.addEventListener('DOMContentLoaded', function() {
+
+
+                // Tab switching
+        const tabs = document.querySelectorAll('.auth-tab');
+        const forms = document.querySelectorAll('.auth-form');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show corresponding form
+                forms.forEach(form => {
+                    form.classList.remove('active');
+                    if (form.id === `${tabId}Form`) {
+                        form.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Switch to login from signup footer link
+        document.querySelector('.switch-to-login')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.auth-tab[data-tab="login"]').click();
+        });
+
+
+    // ==================== Login Form Handling ====================
+            if (loginForm) {
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Clear previous errors and success messages
+                document.querySelectorAll('#loginForm .error-message').forEach(el => {
+                    el.style.display = 'none';
+                });
+                const existingSuccessMsg = document.getElementById('loginSuccessMessage');
+                if (existingSuccessMsg) existingSuccessMsg.remove();
+                
+                // Get form values
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                try {
+                    const response = await fetch('/user_login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        if (data.field) {
+                            const fieldErrorId = `login${data.field.charAt(0).toUpperCase() + data.field.slice(1)}Error`;
+                            const errorField = document.getElementById(fieldErrorId);
+                            if (errorField) {
+                                errorField.textContent = data.message;
+                                errorField.style.display = 'block';
+                            }
+                        } else {
+                            document.getElementById('loginPasswordError').textContent = data.message;
+                            document.getElementById('loginPasswordError').style.display = 'block';
+                        }
+                        return;
+                    }
+                    
+                    const successDiv = document.createElement('div');
+                    successDiv.id = 'loginSuccessMessage';
+                    successDiv.className = 'success-message';
+                    successDiv.textContent = '✅ ' + data.message;
+                    
+                    const submitButton = document.querySelector('#loginForm button[type="submit"]');
+                    submitButton.insertAdjacentElement('afterend', successDiv);
+                    
+                    loginForm.reset();
+                    
+                    if (data.redirect) {
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    }
+                    
+                } catch (error) {
+                    document.getElementById('loginPasswordError').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('loginPasswordError').style.display = 'block';
+                    console.error('Login error:', error);
+                }
+            });
+        }
+
+    // ==================== Signup Form Handling ====================
+let signupEmail = '';  // Global variable
+
+// if (signupForm) {
+//     signupForm.addEventListener('submit', async function(e) {
+//         e.preventDefault();
+        
+//         document.querySelectorAll('#signupForm .error-message').forEach(el => {
+//             el.style.display = 'none';
+//         });
+        
+//         const name = document.getElementById('signupName').value;
+//         const email = document.getElementById('signupEmail').value;
+//         const password = document.getElementById('signupPassword').value;
+//         const phone = document.getElementById('signupPhone').value;
+        
+//         try {
+//             const response = await fetch('/user_signup', {
+//                 method: 'POST',
+//                 headers: {
+//                     'Content-Type': 'application/json'
+//                 },
+//                 body: JSON.stringify({ 
+//                     name: name,
+//                     email: email,
+//                     password: password,
+//                     phone: phone 
+//                 })
+//             });
+            
+//             const data = await response.json();
+            
+//             if (!data.success) {
+//                 if (data.field) {
+//                     const fieldErrorId = `signup${data.field.charAt(0).toUpperCase() + data.field.slice(1)}Error`;
+//                     const errorField = document.getElementById(fieldErrorId);
+//                     if (errorField) {
+//                         errorField.textContent = data.message;
+//                         errorField.style.display = 'block';
+//                     }
+//                 } else {
+//                     document.getElementById('signupNameError').textContent = data.message;
+//                     document.getElementById('signupNameError').style.display = 'block';
+//                 }
+//                 return;
+//             }
+
+//             // ✅ Store signup email globally for OTP verification
+//             signupEmail = email;
+
+//             // ✅ Show OTP modal
+//             document.getElementById('signupOtpInput').value = '';
+//             document.getElementById('otpVerificationModal').style.display = 'block';
+//             document.getElementById('otpVerificationError').style.display = 'none';
+            
+//         } catch (error) {
+//             document.getElementById('signupNameError').textContent = 'An error occurred. Please try again.';
+//             document.getElementById('signupNameError').style.display = 'block';
+//             console.error('Signup error:', error);
+//         }
+//     });
+// }
+
+
+// Signup Form Handler
+            const signupForm = document.getElementById('signupForm');
+// In your signup form handler
+if (signupForm) {
+    signupForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Clear previous errors
+        document.querySelectorAll('#signupForm .error-message').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        const name = document.getElementById('signupName').value;
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        const phone = document.getElementById('signupPhone').value;
+        
+        try {
+            const response = await fetch('/user_signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    name: name,
+                    email: email,
+                    password: password,
+                    phone: phone 
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (!data.success) {
+                if (data.field) {
+                    const fieldErrorId = `signup${data.field.charAt(0).toUpperCase() + data.field.slice(1)}Error`;
+                    const errorField = document.getElementById(fieldErrorId);
+                    if (errorField) {
+                        errorField.textContent = data.message;
+                        errorField.style.display = 'block';
+                    }
+                }
+                return;
+            }
+
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.innerHTML = `
+                <div style="font-size: 1.1em; margin-bottom: 10px;">✅ Registration Successful!</div>
+                <div>${data.message}</div>
+                <div style="margin-top: 10px; font-size: 0.9em; opacity: 0.8;">
+                    📧 Check your email: <strong>${email}</strong> for the verification link
+                </div>
+            `;
+            
+            const submitButton = document.querySelector('#signupForm button[type="submit"]');
+            submitButton.insertAdjacentElement('afterend', successDiv);
+            
+            // Clear the form
+            signupForm.reset();
+            
+        } catch (error) {
+            document.getElementById('signupNameError').textContent = 'An error occurred. Please try again.';
+            document.getElementById('signupNameError').style.display = 'block';
+            console.error('Signup error:', error);
+        }
+    });
+}        
+
+
+
+function showOtpVerification(email) {
+    signupEmail = email;
+    document.getElementById('verificationEmail').textContent = email;
+    
+    const modal = document.getElementById('otpVerificationModal');
+    modal.style.display = 'block';
+    
+    // Clear previous state
+    document.getElementById('signupOtpError').style.display = 'none';
+    document.getElementById('signupOtpInput').value = '';
+    document.getElementById('verifyOtpButton').disabled = false;
+    document.getElementById('verifyOtpButton').textContent = 'Verify';
+    
+    // Focus on OTP input
+    document.getElementById('signupOtpInput').focus();
+}
+
+
+               
+async function verifySignupOTP() {
+    const otp = document.getElementById('signupOtpInput').value.trim();
+    const errorElement = document.getElementById('otpVerificationError');
+    const verifyButton = document.querySelector('#otpVerificationModal button');
+    
+    // Clear previous errors
+    errorElement.style.display = 'none';
+    
+    // Validate OTP format
+    if (!otp || otp.length !== 6 || !/^\d+$/.test(otp)) {
+        errorElement.textContent = 'Please enter a valid 6-digit OTP';
+        errorElement.style.display = 'block';
+        return;
+    }
+    
+    try {
+        // Show loading state
+        verifyButton.disabled = true;
+        verifyButton.textContent = 'Verifying...';
+        
+        const response = await fetch('/verify_signup_otp', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: currentSignupEmail,  // This is set when signup form is submitted
+                otp: otp
+            })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || 'Verification failed');
+        }
+        
+        if (data.success) {
+            // Hide the modal
+            document.getElementById('otpVerificationModal').style.display = 'none';
+            
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = '✅ Email verified successfully! Redirecting...';
+            document.querySelector('.auth-card').appendChild(successDiv);
+            
+            // Redirect
+            setTimeout(() => {
+                window.location.href = data.redirect || '/dashboard';
+            }, 2000);
+        } else {
+            errorElement.textContent = data.message || 'Invalid OTP';
+            errorElement.style.display = 'block';
+        }
+    } catch (error) {
+        errorElement.textContent = error.message || 'Error verifying OTP. Please try again.';
+        errorElement.style.display = 'block';
+        console.error('Verification error:', error);
+    } finally {
+        verifyButton.disabled = false;
+        verifyButton.textContent = 'Verify OTP';
+    }
+}
+
+
+         
+// function verifySignupOTP() {
+//     const otp = document.getElementById("signupOtpInput").value;
+//     fetch("/verify_signup_otp", {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify({ email: signupEmail, otp: otp })
+//     })
+//     .then(res => res.json())
+//     .then(data => {
+//         if (data.success) {
+//             window.location.href = data.redirect;
+//         } else {
+//             document.getElementById("otpVerificationError").textContent = data.message;
+//             document.getElementById("otpVerificationError").style.display = "block";
+//         }
+//     })
+//     .catch(error => {
+//         document.getElementById("otpVerificationError").textContent = "An error occurred. Please try again.";
+//         document.getElementById("otpVerificationError").style.display = "block";
+//         console.error("Fetch error:", error);
+//     });
+// }
+
+
+
+// Close modal function
+function cancelOtpVerification() {
+    document.getElementById('otpVerificationModal').style.display = 'none';
+    document.getElementById('signupOtpInput').value = '';
+    document.getElementById('signupOtpError').style.display = 'none';
+}
+
+
+    // ==================== Form Switching ====================
+    const switchToLoginLinks = document.querySelectorAll('.switch-to-login');
+    switchToLoginLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('signupForm').classList.remove('active');
+        });
+    });
+
+});
+
+
+
+
+
+
+
+
+let currentUserEmail = '';
+let currentUserId = '';
+
+function showForgotPassword() {
+    document.getElementById('forgotPasswordModal').style.display = 'block';
+}
+
+function sendOTP() {
+    const email = document.getElementById('resetEmail').value;
+    currentUserEmail = email;
+    
+    // Clear previous errors
+    document.getElementById('otpErrorMessage').style.display = 'none';
+    
+    // Show loading state
+    const otpButton = document.querySelector('#step1 button');
+    otpButton.disabled = true;
+    otpButton.textContent = 'Sending...';
+    
+    setTimeout(() => {
+        fetch('/forgot_password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('step1').style.display = 'none';
+                document.getElementById('step2').style.display = 'block';
+                document.getElementById('userEmail').textContent = email;
+            } else {
+                const errorElement = document.getElementById('otpErrorMessage');
+                errorElement.textContent = data.message;
+                errorElement.style.display = 'block';
+                otpButton.disabled = false;
+                otpButton.textContent = 'Send OTP';
+            }
+        })
+        .catch(error => {
+            const errorElement = document.getElementById('otpErrorMessage');
+            errorElement.textContent = 'Error sending OTP';
+            errorElement.style.display = 'block';
+            otpButton.disabled = false;
+            otpButton.textContent = 'Send OTP';
+            console.error('Error:', error);
+        });
+    }, 2000);
+}
+
+
+function verifyOTP() {
+    const otp = document.getElementById('otpInput').value;
+    
+    // Clear previous errors
+    document.getElementById('otpVerificationError').style.display = 'none';
+    
+    fetch('/verify_otp', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            email: currentUserEmail,
+            otp: otp
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            currentUserId = data.user_id; // Store the user ID for password reset
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'block';
+        } else {
+            const errorElement = document.getElementById('otpVerificationError');
+            errorElement.textContent = data.message || 'Invalid OTP';
+            errorElement.style.display = 'block';
+        }
+    })
+    .catch(error => {
+        const errorElement = document.getElementById('otpVerificationError');
+        errorElement.textContent = 'Error verifying OTP';
+        errorElement.style.display = 'block';
+        console.error('Error:', error);
+    });
+}
+
+
+function resetPassword() {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    
+    // Clear previous errors
+    document.getElementById('passwordErrorMessage').style.display = 'none';
+    
+    // Validate passwords
+    if (newPassword !== confirmPassword) {
+        const errorElement = document.getElementById('passwordErrorMessage');
+        errorElement.textContent = 'Passwords do not match';
+        errorElement.style.display = 'block';
+        return;
+    }
+    
+    if (newPassword.length < 3) {
+        const errorElement = document.getElementById('passwordErrorMessage');
+        errorElement.textContent = 'Password must be at least 3 characters';
+        errorElement.style.display = 'block';
+        return;
+    }
+    
+    // Show loading state
+    const resetButton = document.querySelector('#step3 button');
+    resetButton.disabled = true;
+    resetButton.textContent = 'Processing...';
+    
+    fetch('/reset_password', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            user_id: currentUserId,
+            new_password: newPassword,
+            confirm_password: confirmPassword
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Hide the modal
+            document.getElementById('forgotPasswordModal').style.display = 'none';
+            
+            // Create and show success message
+            const successMessage = document.createElement('div');
+            successMessage.className = 'success-message';
+            successMessage.textContent = `Password has been updated for ${currentUserEmail}`;
+            
+            // Insert the message at the top of the auth card
+            const authCard = document.querySelector('.auth-card');
+            authCard.insertBefore(successMessage, authCard.firstChild);
+            
+            // Redirect after 2 seconds
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 2000);
+        } else {
+            const errorElement = document.getElementById('passwordErrorMessage');
+            errorElement.textContent = data.message || 'Error resetting password';
+            errorElement.style.display = 'block';
+            resetButton.disabled = false;
+            resetButton.textContent = 'Reset Password';
+        }
+    })
+    .catch(error => {
+        const errorElement = document.getElementById('passwordErrorMessage');
+        errorElement.textContent = 'Error resetting password';
+        errorElement.style.display = 'block';
+        resetButton.disabled = false;
+        resetButton.textContent = 'Reset Password';
+        console.error('Error:', error);
+    });
+}
+
+
+
+
+
+
+function cancelOtpVerification() {
+    // Hide the OTP modal
+    document.getElementById('otpVerificationModal').style.display = 'none';
+    
+    // Clear any existing error messages
+    document.getElementById('signupOtpError').style.display = 'none';
+    
+    // Show cancellation message
+    const authCard = document.querySelector('.auth-card');
+    const existingMessage = document.getElementById('signupCancelMessage');
+    if (existingMessage) existingMessage.remove();
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'signupCancelMessage';
+    messageDiv.className = 'error-message';
+    messageDiv.style.backgroundColor = 'rgba(255, 68, 68, 0.1)';
+    messageDiv.style.borderLeft = '4px solid #ff4444';
+    messageDiv.textContent = 'Email verification cancelled. Please try signing up again.';
+    authCard.insertBefore(messageDiv, authCard.firstChild);
+    
+    // Clear the form
+    document.getElementById('signupForm').reset();
+}
+
+
+function hideForgotPasswordModal() {
+    document.getElementById('forgotPasswordModal').style.display = 'none';
+    
+    // Clear all steps and errors
+    document.getElementById('step1').style.display = 'block';
+    document.getElementById('step2').style.display = 'none';
+    document.getElementById('step3').style.display = 'none';
+    document.getElementById('otpErrorMessage').style.display = 'none';
+    document.getElementById('otpVerificationError').style.display = 'none';
+    document.getElementById('passwordErrorMessage').style.display = 'none';
+    
+    // Clear input fields
+    document.getElementById('resetEmail').value = '';
+    document.getElementById('otpInput').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+    
+    // Show cancellation message (optional)
+    const authCard = document.querySelector('.auth-card');
+    const existingMessage = document.getElementById('forgotPasswordCancelMessage');
+    if (existingMessage) existingMessage.remove();
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.id = 'forgotPasswordCancelMessage';
+    messageDiv.className = 'error-message';
+    messageDiv.style.backgroundColor = 'rgba(255, 68, 68, 0.1)';
+    messageDiv.style.borderLeft = '4px solid #ff4444';
+    messageDiv.textContent = 'Password reset process cancelled.';
+    authCard.insertBefore(messageDiv, authCard.firstChild);
+}
+
+
+
+
+
+
+
+// OTP verification handling
+            document.getElementById('verifyOtpButton').addEventListener('click', handleOtpVerification);
+            document.getElementById('cancelOtpButton').addEventListener('click', closeOtpModal);
+            
+            // OTP input formatting
+            document.getElementById('otpInput').addEventListener('input', function(e) {
+                // Only allow numbers
+                this.value = this.value.replace(/\D/g, '');
+                // Clear error when user starts typing
+                hideError('otpError');
+            });
+            
+            // Close modal when clicking outside
+            document.getElementById('otpModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeOtpModal();
+                }
+            });
+
+        
+        // Utility functions
+        function clearAllErrors() {
+            const errorElements = document.querySelectorAll('.error-message');
+            errorElements.forEach(el => {
+                el.style.display = 'none';
+                el.textContent = '';
+            });
+            
+            const successElements = document.querySelectorAll('.success-message');
+            successElements.forEach(el => el.remove());
+        }
+
+        function showError(elementId, message) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+            }
+        }
+
+        function hideError(elementId) {
+            const errorElement = document.getElementById(elementId);
+            if (errorElement) {
+                errorElement.style.display = 'none';
+                errorElement.textContent = '';
+            }
+        }
+
+        function showSuccess(message, parentElement) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            parentElement.appendChild(successDiv);
+        }
+
+        function setButtonLoading(buttonId, isLoading, loadingText = 'Loading...') {
+            const button = document.getElementById(buttonId);
+            if (isLoading) {
+                button.disabled = true;
+                button.innerHTML = `<span class="loading"></span>${loadingText}`;
+            } else {
+                button.disabled = false;
+                // Reset to original text based on button
+                if (buttonId === 'loginButton') {
+                    button.textContent = 'Login';
+                } else if (buttonId === 'signupButton') {
+                    button.textContent = 'Create Account';
+                } else if (buttonId === 'verifyOtpButton') {
+                    button.textContent = 'Verify OTP';
+                }
+            }
+        }
+
+
+                // Signup handler
+        async function handleSignup(e) {
+            e.preventDefault();
+            clearAllErrors();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const phone = document.getElementById('signupPhone').value;
+            
+            setButtonLoading('signupButton', true, 'Creating Account...');
+            
+            try {
+                const response = await fetch('/user_signup', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password, phone })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success && data.needs_verification) {
+                    // Store email for OTP verification
+                    currentSignupEmail = data.email;
+                    
+                    // Show success message
+                    showSuccess('✅ ' + data.message, document.querySelector('.auth-card'));
+                    
+                    // Show OTP modal after a short delay
+                    setTimeout(() => {
+                        showOtpModal(data.email);
+                    }, 1500);
+                    
+                } else {
+                    // Handle signup errors
+                    if (data.field === 'email') {
+                        showError('signupEmailError', data.message);
+                    } else if (data.field === 'name') {
+                        showError('signupNameError', data.message);
+                    } else {
+                        showError('signupNameError', data.message);
+                    }
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showError('signupNameError', 'An error occurred. Please try again.');
+            } finally {
+                setButtonLoading('signupButton', false);
+            }
+        }
+
+        // Show OTP modal
+        function showOtpModal(email) {
+            document.getElementById('otpEmailDisplay').textContent = email;
+            document.getElementById('otpInput').value = '';
+            hideError('otpError');
+            document.getElementById('otpModal').style.display = 'flex';
+            
+            // Focus on OTP input
+            setTimeout(() => {
+                document.getElementById('otpInput').focus();
+            }, 300);
+        }
+
+        // Close OTP modal
+        function closeOtpModal() {
+            document.getElementById('otpModal').style.display = 'none';
+            document.getElementById('otpInput').value = '';
+            hideError('otpError');
+            currentSignupEmail = '';
+        }
+
+        // OTP verification handler
+        async function handleOtpVerification() {
+            const otpCode = document.getElementById('otpInput').value.trim();
+            
+            // Validate OTP format
+            if (!otpCode || otpCode.length !== 6 || !/^\d+$/.test(otpCode)) {
+                showError('otpError', 'Please enter a valid 6-digit OTP');
+                return;
+            }
+            
+            if (!currentSignupEmail) {
+                showError('otpError', 'Session expired. Please sign up again.');
+                return;
+            }
+            
+            setButtonLoading('verifyOtpButton', true, 'Verifying...');
+            hideError('otpError');
+            
+            try {
+                console.log('Verifying OTP:', { email: currentSignupEmail, otp: otpCode }); // Debug log
+                
+                const response = await fetch('/verify_signup_otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ 
+                        email: currentSignupEmail, 
+                        otp: otpCode 
+                    })
+                });
+                
+                // const data = await response.json();
+                console.log('OTP verification response:', data); // Debug log
+                
+                if (data.success) {
+                    // Close modal
+                    closeOtpModal();
+                    
+                    // Show success message
+                    showSuccess('✅ ' + data.message + ' Redirecting...', document.querySelector('.auth-card'));
+                    
+                    // Clear signup form
+                    document.getElementById('signupForm').reset();
+                    
+                    // Redirect to dashboard
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/dashboard';
+                    }, 2000);
+                    
+                } else {
+                    // Show error in modal
+                    showError('otpError', data.message || 'Invalid OTP. Please try again.');
+                }
+                
+            } catch (error) {
+                console.error('OTP verification error:', error);
+                showError('otpError', 'Verification failed. Please try again.');
+            } finally {
+                setButtonLoading('verifyOtpButton', false);
+            }
+        }
+
+
+</script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscription Management | Salient Object Detection</title>
+    <style>
+        /* Reuse your existing theme styles */
+        :root {
+          --background: #0d1117;
+          --foreground: #c9d1d9;
+          --primary: #00e6ac;
+          --primary-hover: #00b386;
+          --card: #21262d;
+          --card-foreground: #c9d1d9;
+          --muted: #30363d;
+          --muted-foreground: #8b949e;
+          --header: #161b22;
+          --success: #28a745;
+          --warning: #ffc107;
+          --danger: #dc3545;
+          --info: #17a2b8;
+        }
+
+        body {
+          font-family: "Arial", sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: var(--background);
+          color: var(--foreground);
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+        }
+
+        /* Header Styles */
+        header {
+          background-color: var(--header);
+          padding: 20px 40px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          position: sticky;
+          top: 0;
+          z-index: 1000;
+        }
+
+        .header-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          max-width: 1200px;
+          margin: 0 auto;
+        }
+
+        .logo {
+          font-size: 1.5rem;
+          color: var(--primary);
+          font-weight: bold;
+          text-decoration: none;
+        }
+
+        .nav {
+          list-style-type: none;
+          display: flex;
+          margin: 0;
+          padding: 0;
+        }
+
+        .nav li {
+          margin-left: 20px;
+        }
+
+        .nav a {
+          text-decoration: none;
+          color: var(--foreground);
+          font-size: 1rem;
+          padding: 10px 20px;
+          border-radius: 30px;
+          transition: all 0.3s ease-in-out;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+          background: var(--primary);
+          color: var(--background);
+          box-shadow: 0px 0px 10px var(--primary);
+        }
+
+        /* Main Container */
+        .container {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 40px 20px;
+          min-height: calc(100vh - 140px);
+        }
+
+        /* Form Container */
+        .form-container {
+          background-color: var(--card);
+          border-radius: 16px;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          padding: 40px;
+          width: 100%;
+          max-width: 600px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .form-container::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, var(--primary), var(--primary-hover));
+        }
+
+        /* Form Header */
+        .form-header {
+          text-align: center;
+          margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+          color: var(--primary);
+          font-size: 2.2rem;
+          margin-bottom: 10px;
+          font-weight: bold;
+        }
+
+        .form-header p {
+          color: var(--muted-foreground);
+          font-size: 1.1rem;
+          margin: 0;
+        }
+
+        /* Form Styles */
+        .form-group {
+          margin-bottom: 25px;
+          position: relative;
+        }
+
+        .form-group label {
+          display: block;
+          margin-bottom: 8px;
+          font-weight: bold;
+          color: var(--foreground);
+          font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select {
+          width: 100%;
+          padding: 15px;
+          background-color: var(--muted);
+          border: 2px solid var(--muted);
+          border-radius: 10px;
+          color: var(--foreground);
+          font-size: 1rem;
+          box-sizing: border-box;
+          transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(0, 230, 172, 0.1);
+          background-color: rgba(0, 230, 172, 0.05);
+        }
+
+        .form-group input::placeholder {
+          color: var(--muted-foreground);
+        }
+
+        /* Custom Select Styling */
+        .select-wrapper {
+          position: relative;
+        }
+
+        .select-wrapper::after {
+          content: '▼';
+          position: absolute;
+          top: 50%;
+          right: 15px;
+          transform: translateY(-50%);
+          color: var(--primary);
+          pointer-events: none;
+          font-size: 0.8rem;
+        }
+
+        .form-group select {
+          appearance: none;
+          cursor: pointer;
+        }
+
+        /* Plan Type Cards */
+        .plan-selection {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          gap: 15px;
+          margin-top: 10px;
+        }
+
+        .plan-card {
+          background-color: var(--muted);
+          border: 2px solid var(--muted);
+          border-radius: 10px;
+          padding: 20px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+        }
+
+        .plan-card:hover {
+          border-color: var(--primary);
+          transform: translateY(-2px);
+          box-shadow: 0 5px 15px rgba(0, 230, 172, 0.2);
+        }
+
+        .plan-card.selected {
+          border-color: var(--primary);
+          background-color: rgba(0, 230, 172, 0.1);
+        }
+
+        .plan-card input[type="radio"] {
+          display: none;
+        }
+
+        .plan-icon {
+          font-size: 2rem;
+          margin-bottom: 10px;
+          display: block;
+        }
+
+        .plan-name {
+          font-weight: bold;
+          color: var(--primary);
+          margin-bottom: 5px;
+        }
+
+        .plan-price {
+          color: var(--muted-foreground);
+          font-size: 0.9rem;
+        }
+
+        /* Payment Method Cards */
+        .payment-selection {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          gap: 15px;
+          margin-top: 10px;
+        }
+
+        .payment-card {
+          background-color: var(--muted);
+          border: 2px solid var(--muted);
+          border-radius: 10px;
+          padding: 15px;
+          text-align: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        .payment-card:hover {
+          border-color: var(--primary);
+          transform: translateY(-2px);
+        }
+
+        .payment-card.selected {
+          border-color: var(--primary);
+          background-color: rgba(0, 230, 172, 0.1);
+        }
+
+        .payment-card input[type="radio"] {
+          display: none;
+        }
+
+        .payment-icon {
+          font-size: 1.5rem;
+          margin-bottom: 8px;
+          display: block;
+        }
+
+        .payment-name {
+          font-size: 0.9rem;
+          font-weight: bold;
+        }
+
+        /* Action Buttons */
+        .action-section {
+          margin-top: 40px;
+          padding-top: 30px;
+          border-top: 1px solid var(--muted);
+        }
+
+        .action-section h3 {
+          color: var(--primary);
+          margin-bottom: 20px;
+          text-align: center;
+        }
+
+        .action-buttons {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 15px;
+        }
+
+        .action-btn {
+          padding: 15px 25px;
+          border: none;
+          border-radius: 10px;
+          font-size: 1rem;
+          font-weight: bold;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .action-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+          transition: left 0.5s;
+        }
+
+        .action-btn:hover::before {
+          left: 100%;
+        }
+
+        .btn-create {
+          background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+          color: var(--background);
+        }
+
+        .btn-create:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(0, 230, 172, 0.4);
+        }
+
+        .btn-update {
+          background: linear-gradient(135deg, var(--info), #138496);
+          color: white;
+        }
+
+        .btn-update:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(23, 162, 184, 0.4);
+        }
+
+        .btn-delete {
+          background: linear-gradient(135deg, var(--danger), #c82333);
+          color: white;
+        }
+
+        .btn-delete:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+        }
+
+        .btn-view {
+          background: linear-gradient(135deg, var(--warning), #e0a800);
+          color: var(--background);
+        }
+
+        .btn-view:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 25px rgba(255, 193, 7, 0.4);
+        }
+
+        /* Success/Error Messages */
+        .message {
+          padding: 15px;
+          border-radius: 10px;
+          margin-bottom: 20px;
+          font-weight: bold;
+          text-align: center;
+          opacity: 0;
+          transform: translateY(-20px);
+          transition: all 0.3s ease;
+        }
+
+        .message.show {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .message.success {
+          background-color: rgba(40, 167, 69, 0.2);
+          color: var(--success);
+          border: 1px solid var(--success);
+        }
+
+        .message.error {
+          background-color: rgba(220, 53, 69, 0.2);
+          color: var(--danger);
+          border: 1px solid var(--danger);
+        }
+
+        .message.info {
+          background-color: rgba(23, 162, 184, 0.2);
+          color: var(--info);
+          border: 1px solid var(--info);
+        }
+
+        /* Loading Animation */
+        .loading {
+          display: none;
+          text-align: center;
+          margin: 20px 0;
+        }
+
+        .spinner {
+          width: 40px;
+          height: 40px;
+          border: 4px solid var(--muted);
+          border-top: 4px solid var(--primary);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .header-content {
+            flex-direction: column;
+            gap: 15px;
+          }
+
+          .nav {
+            flex-wrap: wrap;
+            justify-content: center;
+          }
+
+          .form-container {
+            padding: 30px 20px;
+            margin: 20px;
+          }
+
+          .form-header h1 {
+            font-size: 1.8rem;
+          }
+
+          .plan-selection {
+            grid-template-columns: 1fr;
+          }
+
+          .payment-selection {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .action-buttons {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        /* Floating Labels Effect */
+        .floating-label {
+          position: relative;
+        }
+
+        .floating-label input {
+          padding-top: 20px;
+        }
+
+        .floating-label label {
+          position: absolute;
+          top: 15px;
+          left: 15px;
+          transition: all 0.3s ease;
+          pointer-events: none;
+          color: var(--muted-foreground);
+        }
+
+        .floating-label input:focus + label,
+        .floating-label input:not(:placeholder-shown) + label {
+          top: 5px;
+          font-size: 0.8rem;
+          color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <a href="#" class="logo">Salient Object Detection</a>
+            <ul class="nav">
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#subscriptions" class="active">Subscriptions</a></li>
+                <li><a href="#payments">Payments</a></li>
+                <li><a href="#settings">Settings</a></li>
+                <li><a href="#logout">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <h1>Subscription Management</h1>
+                <p>Create, update, or manage your subscription plans</p>
+            </div>
+
+            <div id="messageContainer"></div>
+
+            <form id="subscriptionForm">
+                <!-- Subscription ID -->
+                <div class="form-group floating-label">
+                    <input type="text" id="subscriptionId" name="subscriptionId" placeholder=" " required>
+                    <label for="subscriptionId">Subscription ID</label>
+                </div>
+
+                <!-- Plan Type Selection -->
+                <div class="form-group">
+                    <label>Plan Type</label>
+                    <div class="plan-selection">
+                        <div class="plan-card" data-plan="basic">
+                            <input type="radio" name="planType" value="basic" id="planBasic">
+                            <span class="plan-icon">🥉</span>
+                            <div class="plan-name">Basic</div>
+                            <div class="plan-price">$9.99/month</div>
+                        </div>
+                        <div class="plan-card" data-plan="pro">
+                            <input type="radio" name="planType" value="pro" id="planPro">
+                            <span class="plan-icon">🥈</span>
+                            <div class="plan-name">Pro</div>
+                            <div class="plan-price">$24.99/month</div>
+                        </div>
+                        <div class="plan-card" data-plan="enterprise">
+                            <input type="radio" name="planType" value="enterprise" id="planEnterprise">
+                            <span class="plan-icon">🥇</span>
+                            <div class="plan-name">Enterprise</div>
+                            <div class="plan-price">$99.99/month</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Method Selection -->
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <div class="payment-selection">
+                        <div class="payment-card" data-payment="credit-card">
+                            <input type="radio" name="paymentMethod" value="credit-card" id="paymentCredit">
+                            <span class="payment-icon">💳</span>
+                            <div class="payment-name">Credit Card</div>
+                        </div>
+                        <div class="payment-card" data-payment="paypal">
+                            <input type="radio" name="paymentMethod" value="paypal" id="paymentPaypal">
+                            <span class="payment-icon">🅿️</span>
+                            <div class="payment-name">PayPal</div>
+                        </div>
+                        <div class="payment-card" data-payment="bank-transfer">
+                            <input type="radio" name="paymentMethod" value="bank-transfer" id="paymentBank">
+                            <span class="payment-icon">🏦</span>
+                            <div class="payment-name">Bank Transfer</div>
+                        </div>
+                        <div class="payment-card" data-payment="stripe">
+                            <input type="radio" name="paymentMethod" value="stripe" id="paymentStripe">
+                            <span class="payment-icon">💰</span>
+                            <div class="payment-name">Stripe</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions Section -->
+                <div class="action-section">
+                    <h3>Choose Action</h3>
+                    <div class="action-buttons">
+                        <button type="button" class="action-btn btn-create" data-action="create">
+                            ✨ Create Subscription
+                        </button>
+                        <button type="button" class="action-btn btn-update" data-action="update">
+                            🔄 Update Subscription
+                        </button>
+                        <button type="button" class="action-btn btn-view" data-action="view">
+                            👁️ View Details
+                        </button>
+                        <button type="button" class="action-btn btn-delete" data-action="delete">
+                            🗑️ Delete Subscription
+                        </button>
+                    </div>
+                </div>
+
+                <div class="loading" id="loadingIndicator">
+                    <div class="spinner"></div>
+                    <p>Processing your request...</p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('subscriptionForm');
+            const messageContainer = document.getElementById('messageContainer');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+
+            // Plan selection handling
+            document.querySelectorAll('.plan-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                    // Check the radio button
+                    this.querySelector('input[type="radio"]').checked = true;
+                });
+            });
+
+            // Payment method selection handling
+            document.querySelectorAll('.payment-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    // Remove selected class from all cards
+                    document.querySelectorAll('.payment-card').forEach(c => c.classList.remove('selected'));
+                    // Add selected class to clicked card
+                    this.classList.add('selected');
+                    // Check the radio button
+                    this.querySelector('input[type="radio"]').checked = true;
+                });
+            });
+
+            // Action button handling
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const action = this.dataset.action;
+                    const subscriptionId = document.getElementById('subscriptionId').value;
+                    const planType = document.querySelector('input[name="planType"]:checked');
+                    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked');
+
+                    // Validation
+                    if (!subscriptionId.trim()) {
+                        showMessage('Please enter a Subscription ID', 'error');
+                        return;
+                    }
+
+                    if (!planType) {
+                        showMessage('Please select a Plan Type', 'error');
+                        return;
+                    }
+
+                    if (!paymentMethod) {
+                        showMessage('Please select a Payment Method', 'error');
+                        return;
+                    }
+
+                    // Process the action
+                    processAction(action, {
+                        subscriptionId: subscriptionId,
+                        planType: planType.value,
+                        paymentMethod: paymentMethod.value
+                    });
+                });
+            });
+
+            function processAction(action, data) {
+                // Show loading
+                loadingIndicator.style.display = 'block';
+
+                // Simulate API call
+                setTimeout(() => {
+                    loadingIndicator.style.display = 'none';
+
+                    switch(action) {
+                        case 'create':
+                            showMessage(`✅ Subscription ${data.subscriptionId} created successfully!\nPlan: ${data.planType.toUpperCase()}\nPayment: ${data.paymentMethod.replace('-', ' ').toUpperCase()}`, 'success');
+                            resetForm();
+                            break;
+                        case 'update':
+                            showMessage(`🔄 Subscription ${data.subscriptionId} updated successfully!\nNew Plan: ${data.planType.toUpperCase()}\nPayment Method: ${data.paymentMethod.replace('-', ' ').toUpperCase()}`, 'info');
+                            break;
+                        case 'view':
+                            showSubscriptionDetails(data);
+                            break;
+                        case 'delete':
+                            if (confirm(`Are you sure you want to delete subscription ${data.subscriptionId}?`)) {
+                                showMessage(`🗑️ Subscription ${data.subscriptionId} deleted successfully!`, 'success');
+                                resetForm();
+                            }
+                            break;
+                    }
+                }, 1500);
+            }
+
+            function showMessage(text, type) {
+                const message = document.createElement('div');
+                message.className = `message ${type}`;
+                message.innerHTML = text.replace(/\n/g, '<br>');
+                
+                messageContainer.innerHTML = '';
+                messageContainer.appendChild(message);
+                
+                // Trigger animation
+                setTimeout(() => message.classList.add('show'), 100);
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    message.classList.remove('show');
+                    setTimeout(() => {
+                        if (message.parentNode) {
+                            message.parentNode.removeChild(message);
+                        }
+                    }, 300);
+                }, 5000);
+            }
+
+            function showSubscriptionDetails(data) {
+                const details = `
+                    <strong>Subscription Details:</strong><br><br>
+                    📋 <strong>ID:</strong> ${data.subscriptionId}<br>
+                    📦 <strong>Plan:</strong> ${data.planType.toUpperCase()}<br>
+                    💳 <strong>Payment:</strong> ${data.paymentMethod.replace('-', ' ').toUpperCase()}<br>
+                    📅 <strong>Status:</strong> Active<br>
+                    🔄 <strong>Next Billing:</strong> ${getNextBillingDate()}
+                `;
+                showMessage(details, 'info');
+            }
+
+            function getNextBillingDate() {
+                const date = new Date();
+                date.setMonth(date.getMonth() + 1);
+                return date.toLocaleDateString('en-US', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                });
+            }
+
+            function resetForm() {
+                form.reset();
+                document.querySelectorAll('.plan-card, .payment-card').forEach(card => {
+                    card.classList.remove('selected');
+                });
+            }
+
+            // Auto-generate subscription ID
+            document.getElementById('subscriptionId').addEventListener('focus', function() {
+                if (!this.value) {
+                    this.value = 'SUB-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                }
+            });
+
+            // Add floating label animation
+            document.querySelectorAll('.floating-label input').forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value === '') {
+                        this.classList.remove('has-value');
+                    } else {
+                        this.classList.add('has-value');
+                    }
+                });
+            });
+
+            // Add some interactive animations
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.02)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

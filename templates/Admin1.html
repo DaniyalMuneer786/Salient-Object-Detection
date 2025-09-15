@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin | Salient Object Detection</title>
+  <style>
+    :root {
+      --background: #0d1117;
+      --foreground: #c9d1d9;
+      --primary: #00e6ac;
+      --primary-hover: #00b386;
+      --card: #21262d;
+      --card-foreground: #c9d1d9;
+      --muted: #30363d;
+      --muted-foreground: #8b949e;
+      --header: #161b22;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background);
+      color: var(--foreground);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: var(--header);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .auth-container {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 20px;
+      background: radial-gradient(circle at top, #161b22, var(--background));
+    }
+
+    .auth-card {
+      background-color: var(--card);
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      animation: fadeSlideIn 0.8s ease-out;
+    }
+
+    @keyframes fadeSlideIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .auth-card h2 {
+      text-align: center;
+      color: var(--primary);
+      margin-bottom: 30px;
+      font-size: 2rem;
+    }
+
+    .auth-tabs {
+      display: flex;
+      margin-bottom: 30px;
+      border-bottom: 2px solid var(--muted);
+    }
+
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      color: var(--muted-foreground);
+      transition: color 0.3s, border 0.3s;
+    }
+
+    .auth-tab.active {
+      color: var(--primary);
+      border-bottom: 3px solid var(--primary);
+    }
+
+    .auth-form {
+      display: none;
+      animation: fadeSlideIn 0.6s ease-out;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--muted);
+      border-radius: 10px;
+      background-color: var(--muted);
+      color: var(--foreground);
+      font-size: 1rem;
+      transition: border 0.3s, box-shadow 0.3s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 6px rgba(0, 230, 172, 0.5);
+    }
+
+    .auth-button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: var(--background);
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .auth-button:hover {
+      border-style: double;
+      border-color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 230, 172, 0.4);
+    }
+
+    .auth-footer {
+      margin-top: 20px;
+      text-align: center;
+      color: var(--muted-foreground);
+      font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .auth-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: #f97583;
+      font-size: 0.9rem;
+      margin-top: 6px;
+      display: none;
+    }
+
+    footer {
+      background-color: var(--header);
+      padding: 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--muted-foreground);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="#">Salient Object Detection</a>
+  </header>
+
+  <div class="auth-container">
+    <div class="auth-card">
+      <h2>👤 Admin Login Panel</h2>
+      <div class="auth-tabs">
+        <div class="auth-tab active" data-tab="login">Login</div>
+        <div class="auth-tab" data-tab="signup">Sign Up</div>
+      </div>
+
+      <form action="{{ url_for('login') }}" id="loginForm" class="auth-form active">
+        <div class="form-group">
+          <label for="loginEmail">📧 Email</label>
+          <input type="email" id="loginEmail" name="email" required />
+          <div class="error-message" id="loginEmailError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">🔑 Password</label>
+          <input type="password" id="loginPassword" name="password" required />
+          <div class="error-message" id="loginPasswordError"></div>
+        </div>
+
+        <button type="submit" class="auth-button">Log In</button>
+
+        <div class="auth-footer">
+          <a href="#">Forgot your password?</a>
+        </div>
+      </form>
+
+      <form action="{{ url_for('signup') }}" id="signupForm" class="auth-form">
+        <div class="form-group">
+          <label for="signupID">🆔 Admin ID</label>
+          <input type="number" id="signupID" name="Admin_ID" required />
+          <div class="error-message" id="signupIDError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupName">👤 Full Name</label>
+          <input type="text" id="signupName" name="name" required />
+          <div class="error-message" id="signupNameError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupEmail">📧 Email</label>
+          <input type="email" id="signupEmail" name="email" required />
+          <div class="error-message" id="signupEmailError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupPassword">🔐 Password</label>
+          <input type="password" id="signupPassword" name="password" required />
+          <div class="error-message" id="signupPasswordError"></div>
+        </div>
+
+        <div class="form-group">
+          <label for="signupSalary">💰 Salary</label>
+          <input type="number" id="signupSalary" name="salary" />
+          <div class="error-message" id="signupSalaryError"></div>
+        </div>
+
+        <button type="submit" class="auth-button">Create Account</button>
+
+        <div class="auth-footer">
+          Already registered? <a href="#" class="switch-to-login">Login here</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    &copy; <span id="current-year"></span> Salient Object Detection. All rights reserved.
+  </footer>
+
+    
+            <!-- =========================================================================== -->
+    
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+
+                // Tab switching
+        const tabs = document.querySelectorAll('.auth-tab');
+        const forms = document.querySelectorAll('.auth-form');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show corresponding form
+                forms.forEach(form => {
+                    form.classList.remove('active');
+                    if (form.id === `${tabId}Form`) {
+                        form.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Switch to login from signup footer link
+        document.querySelector('.switch-to-login')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector('.auth-tab[data-tab="login"]').click();
+        });
+
+
+    // ==================== Login Form Handling ====================
+            if (loginForm) {
+            loginForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                // Clear previous errors and success messages
+                document.querySelectorAll('#loginForm .error-message').forEach(el => {
+                    el.style.display = 'none';
+                });
+                const existingSuccessMsg = document.getElementById('loginSuccessMessage');
+                if (existingSuccessMsg) existingSuccessMsg.remove();
+                
+                // Get form values
+                const email = document.getElementById('loginEmail').value;
+                const password = document.getElementById('loginPassword').value;
+                
+                try {
+                    const response = await fetch('/admin_login', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ email, password })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        if (data.field) {
+                            const fieldErrorId = `login${data.field.charAt(0).toUpperCase() + data.field.slice(1)}Error`;
+                            const errorField = document.getElementById(fieldErrorId);
+                            if (errorField) {
+                                errorField.textContent = data.message;
+                                errorField.style.display = 'block';
+                            }
+                        } else {
+                            document.getElementById('loginPasswordError').textContent = data.message;
+                            document.getElementById('loginPasswordError').style.display = 'block';
+                        }
+                        return;
+                    }
+                    
+                    const successDiv = document.createElement('div');
+                    successDiv.id = 'loginSuccessMessage';
+                    successDiv.className = 'success-message';
+                    successDiv.textContent = '✅ ' + data.message;
+                    
+                    const submitButton = document.querySelector('#loginForm button[type="submit"]');
+                    submitButton.insertAdjacentElement('afterend', successDiv);
+                    
+                    loginForm.reset();
+                    
+                    if (data.redirect) {
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    }
+                    
+                } catch (error) {
+                    document.getElementById('loginPasswordError').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('loginPasswordError').style.display = 'block';
+                    console.error('Login error:', error);
+                }
+            });
+        }
+
+    // ==================== Signup Form Handling ====================
+    if (signupForm) {
+            signupForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('#signupForm .error-message').forEach(el => {
+                    el.style.display = 'none';
+                });
+                const existingSuccessMsg = document.getElementById('signupSuccessMessage');
+                if (existingSuccessMsg) existingSuccessMsg.remove();
+                
+                const id = document.getElementById('signupID').value;
+                const name = document.getElementById('signupName').value;
+                const email = document.getElementById('signupEmail').value;
+                const password = document.getElementById('signupPassword').value;
+                const salary = document.getElementById('signupSalary').value;
+                
+                if (password.length < 3) {
+                    document.getElementById('signupPasswordError').textContent = 'Password must be at least 3 characters';
+                    document.getElementById('signupPasswordError').style.display = 'block';
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/admin_signup', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ 
+                            id: id,
+                            name: name,
+                            email: email,
+                            password: password,
+                            salary: salary 
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!data.success) {
+                        if (data.field) {
+                            const fieldErrorId = `signup${data.field.charAt(0).toUpperCase() + data.field.slice(1)}Error`;
+                            const errorField = document.getElementById(fieldErrorId);
+                            if (errorField) {
+                                errorField.textContent = data.message;
+                                errorField.style.display = 'block';
+                            }
+                        } else {
+                            document.getElementById('signupNameError').textContent = data.message;
+                            document.getElementById('signupNameError').style.display = 'block';
+                        }
+                        return;
+                    }
+                    
+                    const successDiv = document.createElement('div');
+                    successDiv.id = 'signupSuccessMessage';
+                    successDiv.className = 'success-message';
+                    successDiv.textContent = '✅ ' + data.message;
+                    
+                    const submitButton = document.querySelector('#signupForm button[type="submit"]');
+                    submitButton.insertAdjacentElement('afterend', successDiv);
+                    
+                    signupForm.reset();
+                    
+                    if (data.redirect) {
+                        setTimeout(() => {
+                            window.location.href = data.redirect;
+                        }, 2000);
+                    }
+                    
+                } catch (error) {
+                    document.getElementById('signupNameError').textContent = 'An error occurred. Please try again.';
+                    document.getElementById('signupNameError').style.display = 'block';
+                    console.error('Signup error:', error);
+                }
+            });
+        }    
+
+
+        
+
+        Object.entries(row).forEach(([key, value]) => {
+          const val = key.toLowerCase().includes('password') ? '********' : (value || '-');
+          tableHTML += `<td title="${val}" style="max-width: 250px; word-wrap: break-word;">${val}</td>`;
+      });
+
+      Object.values(row).forEach(value => {
+        const val = value || '-';
+        tableHTML += `<td title="${val}" style="max-width: 250px; word-wrap: break-word;">${val}</td>`;
+    });
+
+
+    
+    // ==================== Form Switching ====================
+    const switchToLoginLinks = document.querySelectorAll('.switch-to-login');
+    switchToLoginLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('signupForm').classList.remove('active');
+        });
+    });
+
+});
+
+
+</script>
+
+
+
+</body>
+</html>

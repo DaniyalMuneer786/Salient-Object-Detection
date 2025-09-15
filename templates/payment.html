@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Plans - Salient Object Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Salient Object Detection</div>
+            <ul class="nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="/detection">Detection</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/payment" class="active">Payment</a></li>
+                <li><a href="/feedback">Feedback</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="section">
+        <div class="container">
+            <div class="panel">
+                <h2>Pricing Plans</h2>
+                <div class="payment-content">
+                    <div class="payment-intro">
+                        <p>Choose the plan that best fits your needs. All plans include access to our core salient object detection technology.</p>
+                    </div>
+
+                    <div class="pricing-plans">
+                        <div class="pricing-card">
+                            <div class="pricing-header">
+                                <h3>Basic</h3>
+                                <p>Perfect for individuals and small projects</p>
+                                <div class="pricing-price">
+                                    <span class="price">$9.99</span>
+                                    <span class="period">/month</span>
+                                </div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li>100 image detections per month</li>
+                                <li>Standard resolution support</li>
+                                <li>Basic mask and heatmap generation</li>
+                                <li>24-hour result storage</li>
+                                <li>Email support</li>
+                            </ul>
+                            <button class="pricing-button primary">Get Started</button>
+                        </div>
+
+                        <div class="pricing-card popular">
+                            <div class="popular-badge">Most Popular</div>
+                            <div class="pricing-header">
+                                <h3>Pro</h3>
+                                <p>Ideal for professionals and growing businesses</p>
+                                <div class="pricing-price">
+                                    <span class="price">$24.99</span>
+                                    <span class="period">/month</span>
+                                </div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li>500 image detections per month</li>
+                                <li>High resolution support</li>
+                                <li>Advanced mask and heatmap generation</li>
+                                <li>7-day result storage</li>
+                                <li>Priority email support</li>
+                                <li>Batch processing</li>
+                                <li>API access</li>
+                            </ul>
+                            <button class="pricing-button primary">Get Started</button>
+                        </div>
+
+                        <div class="pricing-card">
+                            <div class="pricing-header">
+                                <h3>Enterprise</h3>
+                                <p>For organizations with high-volume needs</p>
+                                <div class="pricing-price">
+                                    <span class="price">$99.99</span>
+                                    <span class="period">/month</span>
+                                </div>
+                            </div>
+                            <ul class="pricing-features">
+                                <li>Unlimited image detections</li>
+                                <li>Ultra-high resolution support</li>
+                                <li>Premium mask and heatmap generation</li>
+                                <li>30-day result storage</li>
+                                <li>24/7 priority support</li>
+                                <li>Advanced batch processing</li>
+                                <li>Full API access with higher rate limits</li>
+                                <li>Custom integration assistance</li>
+                                <li>Dedicated account manager</li>
+                            </ul>
+                            <button class="pricing-button primary">Get Started</button>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h2>Payment Methods</h2>
+                        <div class="payment-methods">
+                            <p>We accept the following payment methods:</p>
+                            <div class="payment-icons">
+                                <div>
+                                    <div>💳</div>
+                                    <p>Credit Card</p>
+                                </div>
+                                <div>
+                                    <div>🅿️</div>
+                                    <p>PayPal</p>
+                                </div>
+                                <div>
+                                    <div>🏦</div>
+                                    <p>Bank Transfer</p>
+                                </div>
+                                <div>
+                                    <div>₿</div>
+                                    <p>Cryptocurrency</p>
+                                </div>
+                            </div>
+                            <p>
+                                For enterprise plans or custom billing arrangements, please contact our sales team at <strong>sales@salientdetection.com</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Salient Object Detection</h3>
+                    <p>Advanced AI-powered system for detecting and highlighting key objects in images.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/detection">Detection</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/payment">Payment</a></li>
+                        <li><a href="/feedback">Feedback</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@salientdetection.com</p>
+                    <p>Phone: +1 (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="current-year"></span> Salient Object Detection. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Object Detection</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Object Detection</h1>
+        <div class="upload-section">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" id="fileInput" accept="image/*" required>
+                <button type="submit">Upload and Process</button>
+            </form>
+        </div>
+        <div class="results-section">
+            <div class="image-container">
+                <h2>Original Image</h2>
+                <img id="originalImage" src="/placeholder.svg" alt="Original Image">
+            </div>
+            <div class="image-container">
+                <h2>Saliency Mask</h2>
+                <img id="maskImage" src="/placeholder.svg" alt="Saliency Mask">
+            </div>
+            <div class="image-container">
+                <h2>Heatmap Overlay</h2>
+                <img id="heatmapImage" src="/placeholder.svg" alt="Heatmap Overlay">
+            </div>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html> 

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback - Salient Object Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">Salient Object Detection</div>
+            <ul class="nav">
+                <li><a href="/">Home</a></li>
+                <li><a href="/detection">Detection</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/payment">Payment</a></li>
+                <li><a href="/feedback" class="active">Feedback</a></li>
+                <li><a href="/logout">Logout</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="section">
+        <div class="container">
+            <div class="panel">
+                <h2>Share Your Feedback</h2>
+                <div class="feedback-content">
+                    <div class="feedback-intro">
+                        <p>We value your opinion! Please share your thoughts and experiences with our salient object detection service. Your feedback helps us improve and better serve your needs.</p>
+                    </div>
+
+                    <form class="feedback-form" id="feedbackForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" placeholder="Your name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" placeholder="Your email address" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>How would you rate your experience?</label>
+                            <div class="rating">
+                                <button type="button" class="star-btn" data-rating="1">★</button>
+                                <button type="button" class="star-btn" data-rating="2">★</button>
+                                <button type="button" class="star-btn" data-rating="3">★</button>
+                                <button type="button" class="star-btn" data-rating="4">★</button>
+                                <button type="button" class="star-btn" data-rating="5">★</button>
+                            </div>
+                            <input type="hidden" id="rating" name="rating" value="0">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="feedbackType">Type of Feedback</label>
+                            <select id="feedbackType" name="feedbackType" required>
+                                <option value="">Select feedback type</option>
+                                <option value="general">General Feedback</option>
+                                <option value="bug">Bug Report</option>
+                                <option value="feature">Feature Request</option>
+                                <option value="improvement">Improvement Suggestion</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="feedback">Your Feedback</label>
+                            <textarea id="feedback" name="feedback" rows="6" placeholder="Please share your thoughts, suggestions, or report any issues you've encountered..." required></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="improvements">What improvements would you like to see?</label>
+                            <textarea id="improvements" name="improvements" rows="4" placeholder="Any specific features or improvements you'd like us to consider..."></textarea>
+                        </div>
+
+                        <div class="form-submit">
+                            <button type="submit" class="submit-button">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>Salient Object Detection</h3>
+                    <p>Advanced AI-powered system for detecting and highlighting key objects in images.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/detection">Detection</a></li>
+                        <li><a href="/about">About</a></li>
+                        <li><a href="/payment">Payment</a></li>
+                        <li><a href="/feedback">Feedback</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <p>Email: info@salientdetection.com</p>
+                    <p>Phone: +1 (555) 123-4567</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; <span id="current-year"></span> Salient Object Detection. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current year in footer
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            
+            // Rating system
+            const starButtons = document.querySelectorAll('.star-btn');
+            const ratingInput = document.getElementById('rating');
+            
+            starButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const rating = this.getAttribute('data-rating');
+                    ratingInput.value = rating;
+                    
+                    // Update star appearance
+                    starButtons.forEach(btn => {
+                        const btnRating = btn.getAttribute('data-rating');
+                        if (btnRating <= rating) {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            // Form submission
+            const feedbackForm = document.getElementById('feedbackForm');
+            feedbackForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Thank you for your feedback! We appreciate your input.');
+                feedbackForm.reset();
+                starButtons.forEach(btn => btn.classList.remove('active'));
+                ratingInput.value = 0;
+            });
+        });
+    </script>
+</body>
+</html>
+
